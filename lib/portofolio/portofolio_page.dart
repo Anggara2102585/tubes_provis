@@ -23,9 +23,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/beranda', // Set the initial route to '/beranda'
+      initialRoute: '/', // Set the initial route to '/beranda'
       routes: {
-        '/beranda': (context) => HomePage(),
+        '/': (context) => HomePage(),
         '/marketplace': (context) => MarketplacePage(),
         '/portofolio': (context) => PortofolioPage(),
         '/profil': (context) => ProfilPage(),
@@ -51,7 +51,7 @@ class _PortofolioPageState extends State<PortofolioPage> {
     switch (_selectedIndex) {
       case 0:
         Navigator.pushReplacementNamed(context,
-            '/beranda'); // Use pushReplacementNamed to replace the current page
+            '/'); // Use pushReplacementNamed to replace the current page
         break;
       case 1:
         Navigator.pushReplacementNamed(context, '/marketplace');
