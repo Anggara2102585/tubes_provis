@@ -10,6 +10,10 @@ class Dompet(Base):
     id_dompet = Column(Integer, primary_key=True, index=True, autoincrement=True)
     saldo = Column(Numeric(precision=15, scale=2))
 
+    umkm = relationship("Umkm", uselist=False, back_populates="dompet")
+    pendana = relationship("Pendana", uselist=False, back_populates="dompet")
+    riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="dompet")
+
 class Umkm(Base):
     __tablename__ = "umkm"
 
@@ -24,6 +28,10 @@ class Umkm(Base):
     limit_pinjaman = Column(Numeric(precision=15, scale=2))
     omzet = Column(Numeric(precision=15, scale=2))
     id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
+
+    dompet = relationship("Dompet", back_populates="umkm")
+    pendanaan = relationship("Pendanaan", back_populates="umkm")
+    notifikasi = relationship("Notifikasi", secondary="umkm_notifikasi", back_populates="umkm")
 
 class Pendanaan(Base):
     __tablename__ = "pendanaan"
@@ -44,14 +52,20 @@ class Pendanaan(Base):
     tanggal_selesai = Column(DateTime)
     # skip id_ulasan_user
 
+    umkm = relationship("Umkm", back_populates="pendanaan")
+    pendana = relationship("Pendana", secondary="pendanaan_pendana", back_populates="pendanaan")
+
 class RiwayatTransaksi(Base):
     __tablename__ = "riwayat_transaksi"
 
     id_riwayat_transaksi = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
     jenis_transaksi = Column(String)
     nominal = Column(Numeric(precision=15,scale=2))
     tanggal = Column(DateTime)
     keterangan = Column(String)
+
+    dompet = relationship("Dompet", back_populates="riwayat_transaksi")
 
 class Notifikasi(Base):
     __tablename__ = "notifikasi"
@@ -62,6 +76,9 @@ class Notifikasi(Base):
     waktu_tanggal = Column(DateTime)
     is_terbaca = Column(Boolean, default=False)
 
+    umkm = relationship("Umkm", secondary="umkm_notifikasi", back_populates="notifikasi")
+    pendana = relationship("Pendana", secondary="pendana_notifikasi", back_populates="notifikasi")
+
 class Pendana(Base):
     __tablename__ = "pendana"
 
@@ -69,6 +86,10 @@ class Pendana(Base):
     foto_profil = Column(String, unique=True)
     nama_pendana = Column(String)
     id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
+
+    dompet = relationship("Dompet", back_populates="pendana")
+    pendanaan = relationship("Pendanaan", secondary="pendanaan_pendana", back_populates="pendana")
+    notifikasi = relationship("Notifikasi", secondary="pendana_notifikasi", back_populates="pendana")
 
 # table many to many Umkm - Notifikasi
 class UmkmNotifikasi(Base):
@@ -99,5 +120,15 @@ class PendanaanPendana(Base):
     __tablename__ = "pendanaan_pendana"
     
     id_pendanaan_pendana = Column(Integer, primary_key=True,autoincrement=True)
-    id_pendana = Column(Integer, ForeignKey("pendana.id_pendana"))
     id_pendanaan = Column(Integer, ForeignKey("pendanaan.id_pendanaan"))
+    id_pendana = Column(Integer, ForeignKey("pendana.id_pendana"))
+    
+    # pendanaan = relationship("Pendanaan", back_populates="pendanaan_pendana")
+    # pendana = relationship("Pendana", back_populates="pendanaan_pendana")
+
+# pendanaan_pendana = Table(
+#     "pendanaan_pendana",
+#     Base.metadata,
+#     Column("id_pendanaan", Integer, ForeignKey("pendanaan.id_pendanaan"), primary_key=True),
+#     Column("id_pendana", Integer, ForeignKey("pendana.id_pendana"), primary_key=True)
+# )
