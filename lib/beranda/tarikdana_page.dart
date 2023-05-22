@@ -9,57 +9,10 @@ import '../assets/font.dart';
 class TarikDanaPage extends StatefulWidget {
   @override
   _TarikDanaPageState createState() => _TarikDanaPageState();
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: TarikDanaPage(),
-      routes: {
-        '/notification': (context) => NotificationPage(),
-        '/topup': (context) => TopUpPage(),
-        '/withdraw': (context) => TarikDanaPage(),
-        '/marketplace': (context) => MarketplacePage(),
-        '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => ProfilPage(),
-      },
-    );
-  }
 }
 
 class _TarikDanaPageState extends State<TarikDanaPage> {
   int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) {
-      // Kembali ke halaman sebelumnya
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-
-    // Navigate to the corresponding page based on the selected index
-    switch (_selectedIndex) {
-      case 0:
-        // Do nothing or handle home page logic
-        break;
-      case 1:
-        Navigator.pushNamed(context, '/marketplace');
-        break;
-      case 2:
-        Navigator.pushNamed(context, '/portofolio');
-        break;
-      case 3:
-        Navigator.pushNamed(context, '/profil');
-        break;
-    }
-  }
-
   double saldo = 1000; // Saldo awal
 
   TextEditingController jumlahController = TextEditingController();
@@ -84,6 +37,11 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
   }
 
   void _tarikDana() {
+    if (nomorRekeningController.text.isEmpty) {
+      _showErrorDialog('Nomor Rekening belum diisi');
+      return;
+    }
+
     double jumlah = double.parse(jumlahController.text);
     setState(() {
       saldo -= jumlah;
@@ -108,6 +66,28 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                   nomorRekeningController.text =
                       originalNomorRekeningController.text;
                 });
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Error',
+          ),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
                 Navigator.of(context).pop();
               },
               child: Text('OK'),
@@ -293,6 +273,56 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
         unselectedItemColor: Colors.green[100],
         onTap: _onItemTapped,
       ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+
+    // Navigate to the corresponding page based on the selected index
+    switch (_selectedIndex) {
+      case 0:
+        // Do nothing or handle home page logic
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/marketplace');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/portofolio');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profil');
+        break;
+    }
+  }
+}
+
+class TarikDanaPageWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Beranda',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: TarikDanaPage(),
+      routes: {
+        '/notification': (context) => NotificationPage(),
+        '/topup': (context) => TopUpPage(),
+        '/withdraw': (context) => TarikDanaPage(),
+        '/marketplace': (context) => MarketplacePage(),
+        '/portofolio': (context) => PortofolioPage(),
+        '/profil': (context) => ProfilPage(),
+      },
     );
   }
 }
