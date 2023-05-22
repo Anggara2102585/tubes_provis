@@ -91,13 +91,27 @@ class _TopUpPageState extends State<TopUpPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  const Text('Masukkan jumlah top up:'),
-                  TextField(
-                    keyboardType: TextInputType.number,
-                    onChanged: _handleTopUpAmountChange,
-                    decoration: InputDecoration(
-                      hintText: '0',
-                      prefixText: 'Rp.',
+                  const Text(
+                    'Masukkan jumlah top up:',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: _handleTopUpAmountChange,
+                      decoration: InputDecoration(
+                        hintText: '0',
+                        prefixText: 'Rp.',
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
