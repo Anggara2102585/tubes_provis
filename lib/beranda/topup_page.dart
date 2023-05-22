@@ -224,7 +224,3 @@ class _TopUpPageState extends State<TopUpPage> {
     );
   }
 }
-
-void main() {
-  runApp(TopUpPage());
-}
