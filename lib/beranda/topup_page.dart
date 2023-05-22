@@ -209,10 +209,6 @@ class _TopUpPageState extends State<TopUpPage> {
                 icon: Icon(Icons.person),
                 label: 'Profil',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.arrow_back),
-                label: 'Kembali',
-              ),
             ],
             currentIndex: _selectedIndex,
             selectedItemColor: Colors.blue,
