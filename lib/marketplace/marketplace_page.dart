@@ -44,9 +44,14 @@ class _MarketplacePageState extends State<MarketplacePage> {
   int _selectedIndex = 1; // Set default selected index to 1 (Marketplace)
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
 
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {

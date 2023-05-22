@@ -1,17 +1,73 @@
 import 'package:flutter/material.dart';
+import 'notification_page.dart';
+import 'topup_page.dart';
+import '../marketplace/marketplace_page.dart';
+import '../portofolio/portofolio_page.dart';
+import '../profil/profil_page.dart';
 import '../assets/font.dart';
 
 class TarikDanaPage extends StatefulWidget {
   @override
   _TarikDanaPageState createState() => _TarikDanaPageState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Beranda',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: TarikDanaPage(),
+      routes: {
+        '/notification': (context) => NotificationPage(),
+        '/topup': (context) => TopUpPage(),
+        '/withdraw': (context) => TarikDanaPage(),
+        '/marketplace': (context) => MarketplacePage(),
+        '/portofolio': (context) => PortofolioPage(),
+        '/profil': (context) => ProfilPage(),
+      },
+    );
+  }
 }
 
 class _TarikDanaPageState extends State<TarikDanaPage> {
   int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+
+    // Navigate to the corresponding page based on the selected index
+    switch (_selectedIndex) {
+      case 0:
+        // Do nothing or handle home page logic
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/marketplace');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/portofolio');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profil');
+        break;
+    }
+  }
+
   double saldo = 1000; // Saldo awal
 
   TextEditingController jumlahController = TextEditingController();
   TextEditingController nomorRekeningController = TextEditingController();
+
+  TextEditingController originalJumlahController = TextEditingController();
+  TextEditingController originalNomorRekeningController =
+      TextEditingController();
 
   List<String> daftarBank = [
     'BNI',
@@ -27,10 +83,55 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
     });
   }
 
-  void _onItemTapped(int index) {
+  void _tarikDana() {
+    double jumlah = double.parse(jumlahController.text);
     setState(() {
-      _selectedIndex = index;
+      saldo -= jumlah;
     });
+    _showSuccessDialog();
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Sukses',
+          ),
+          content: Text('Uang berhasil ditarik.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  jumlahController.text = originalJumlahController.text;
+                  nomorRekeningController.text =
+                      originalNomorRekeningController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    originalJumlahController.text = jumlahController.text;
+    originalNomorRekeningController.text = nomorRekeningController.text;
+  }
+
+  @override
+  void dispose() {
+    jumlahController.dispose();
+    nomorRekeningController.dispose();
+    originalJumlahController.dispose();
+    originalNomorRekeningController.dispose();
+    super.dispose();
   }
 
   @override
@@ -71,7 +172,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                     child: TextField(
                       controller: jumlahController,
                       keyboardType: TextInputType.number,
-                      style: TextStyle(fontSize: 18),
+                      style: bodyTextStyle,
                       decoration: InputDecoration(
                         hintText: '0',
                         border: InputBorder.none,
@@ -121,7 +222,6 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                           value: val,
                           groupValue: bankTerpilih,
                           onChanged: _handleBankChange,
-                          activeColor: Colors.green,
                         ),
                       );
                     }).toList(),
@@ -138,7 +238,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
             TextField(
               controller: nomorRekeningController,
               keyboardType: TextInputType.number,
-              style: TextStyle(fontSize: 18),
+              style: bodyBoldTextStyle,
               decoration: InputDecoration(
                 hintText: 'Masukkan nomor rekening',
                 border: OutlineInputBorder(
@@ -152,12 +252,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
-                onPressed: () {
-                  double jumlah = double.parse(jumlahController.text);
-                  setState(() {
-                    saldo -= jumlah;
-                  });
-                },
+                onPressed: _tarikDana,
                 style: ElevatedButton.styleFrom(
                   primary: Colors.green,
                   shape: RoundedRectangleBorder(
@@ -167,7 +262,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                 ),
                 child: Text(
                   'Tarik',
-                  style: bodyTextStyle,
+                  style: bodyBoldTextStyle,
                 ),
               ),
             ),

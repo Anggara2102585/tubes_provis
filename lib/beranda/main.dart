@@ -44,9 +44,14 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
 
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {

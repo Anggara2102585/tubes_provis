@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'notification_page.dart';
+import 'tarikdana_page.dart';
+import '../marketplace/marketplace_page.dart';
+import '../portofolio/portofolio_page.dart';
+import '../profil/profil_page.dart';
 import '../assets/font.dart';
 
 enum MetodeTopUp { transferBank, eWallet }
@@ -6,14 +11,61 @@ enum MetodeTopUp { transferBank, eWallet }
 class TopUpPage extends StatefulWidget {
   @override
   _TopUpPageState createState() => _TopUpPageState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Beranda',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: TopUpPage(),
+      routes: {
+        '/notification': (context) => NotificationPage(),
+        '/topup': (context) => TopUpPage(),
+        '/withdraw': (context) => TarikDanaPage(),
+        '/marketplace': (context) => MarketplacePage(),
+        '/portofolio': (context) => PortofolioPage(),
+        '/profil': (context) => ProfilPage(),
+      },
+    );
+  }
 }
 
 class _TopUpPageState extends State<TopUpPage> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+
+    // Navigate to the corresponding page based on the selected index
+    switch (_selectedIndex) {
+      case 0:
+        // Do nothing or handle home page logic
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/marketplace');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/portofolio');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profil');
+        break;
+    }
+  }
+
   MetodeTopUp selectedMetode = MetodeTopUp.transferBank;
   String selectedBank = 'BNI';
   String selectedEwallet = 'OVO';
   String topUpAmount = '0';
-  int _selectedIndex = 0;
 
   final List<String> bankOptions = [
     'BNI',
@@ -57,17 +109,6 @@ class _TopUpPageState extends State<TopUpPage> {
     setState(() {
       topUpAmount = value;
     });
-  }
-
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) {
-      // Kembali ke halaman sebelumnya
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
   }
 
   @override
