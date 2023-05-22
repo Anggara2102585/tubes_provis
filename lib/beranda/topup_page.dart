@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../assets/font.dart';
 
 enum MetodeTopUp { transferBank, eWallet }
 
@@ -72,11 +73,16 @@ class _TopUpPageState extends State<TopUpPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Directionality(
         textDirection: TextDirection.ltr,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Top Up'),
+            title: Text(
+              'Top Up',
+              style: titleTextStyle,
+            ),
+            backgroundColor: Colors.green,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () {
@@ -91,11 +97,9 @@ class _TopUpPageState extends State<TopUpPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Masukkan jumlah top up:',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
+                    style: bodyBoldTextStyle,
                   ),
                   const SizedBox(height: 8),
                   Container(
@@ -115,21 +119,32 @@ class _TopUpPageState extends State<TopUpPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text('Pilih salah satu metode top up di bawah ini:'),
+                  Text(
+                    'Pilih salah satu metode top up di bawah ini:',
+                    style: bodyBoldTextStyle,
+                  ),
                   ListTile(
-                    title: const Text('Transfer Bank'),
+                    title: Text(
+                      'Transfer Bank',
+                      style: bodyTextStyle,
+                    ),
                     leading: Radio<MetodeTopUp>(
                       value: MetodeTopUp.transferBank,
                       groupValue: selectedMetode,
                       onChanged: _handleMetodeTopUpChange,
+                      activeColor: Colors.green,
                     ),
                   ),
                   ListTile(
-                    title: const Text('E-wallet'),
+                    title: Text(
+                      'E-wallet',
+                      style: bodyTextStyle,
+                    ),
                     leading: Radio<MetodeTopUp>(
                       value: MetodeTopUp.eWallet,
                       groupValue: selectedMetode,
                       onChanged: _handleMetodeTopUpChange,
+                      activeColor: Colors.green,
                     ),
                   ),
                   if (selectedMetode == MetodeTopUp.transferBank)
@@ -144,7 +159,10 @@ class _TopUpPageState extends State<TopUpPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Pilih bank yang akan digunakan:'),
+                          Text(
+                            'Pilih bank yang akan digunakan:',
+                            style: bodyBoldTextStyle,
+                          ),
                           Wrap(
                             children: bankOptions.map((String val) {
                               return ListTile(
@@ -153,6 +171,7 @@ class _TopUpPageState extends State<TopUpPage> {
                                   value: val,
                                   groupValue: selectedBank,
                                   onChanged: _handleBankChange,
+                                  activeColor: Colors.green,
                                 ),
                               );
                             }).toList(),
@@ -172,7 +191,10 @@ class _TopUpPageState extends State<TopUpPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Pilih e-wallet yang akan digunakan:'),
+                          Text(
+                            'Pilih e-wallet yang akan digunakan:',
+                            style: bodyBoldTextStyle,
+                          ),
                           Wrap(
                             children: ewalletOptions.map((String val) {
                               return ListTile(
@@ -198,7 +220,14 @@ class _TopUpPageState extends State<TopUpPage> {
                         print('Selected e-Wallet: $selectedEwallet');
                         print('Top Up Amount: Rp.$topUpAmount');
                       },
-                      child: Text('TOP UP'),
+                      style: ElevatedButton.styleFrom(
+                        primary:
+                            Colors.green, // Mengubah warna button menjadi hijau
+                      ),
+                      child: Text(
+                        'TOP UP',
+                        style: subtitleTextStyle,
+                      ),
                     ),
                   ),
                 ],
@@ -225,8 +254,8 @@ class _TopUpPageState extends State<TopUpPage> {
               ),
             ],
             currentIndex: _selectedIndex,
-            selectedItemColor: Colors.blue,
-            unselectedItemColor: Colors.blue[100],
+            selectedItemColor: Colors.green,
+            unselectedItemColor: Colors.green[100],
             onTap: _onItemTapped,
           ),
         ),

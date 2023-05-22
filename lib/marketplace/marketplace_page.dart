@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../portofolio/portofolio_page.dart';
 import '../profil/profil_page.dart';
 import '../beranda/main.dart';
+import '../assets/font.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Beranda',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialRoute: '/', // Set the initial route to '/beranda'
@@ -69,10 +70,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Marketplace'),
+        title: Text(
+          'Marketplace',
+          style: titleTextStyle,
+        ),
       ),
       body: Center(
-        child: Text('Marketplace'),
+        child: Text(
+          'Marketplace',
+          style: titleTextStyle,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -94,8 +101,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.blue[100],
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.green[100],
         onTap: _onItemTapped,
       ),
     );
