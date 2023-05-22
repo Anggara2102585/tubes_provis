@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../marketplace/marketplace_page.dart';
 import '../profil/profil_page.dart';
 import '../beranda/main.dart';
+import '../assets/font.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Beranda',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialRoute: '/', // Set the initial route to '/beranda'
@@ -43,9 +44,14 @@ class _PortofolioPageState extends State<PortofolioPage> {
   int _selectedIndex = 2; // Set default selected index to 1 (Portofolio)
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
 
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
@@ -68,10 +74,16 @@ class _PortofolioPageState extends State<PortofolioPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Portofolio'),
+        title: Text(
+          'Portofolio',
+          style: titleTextStyle,
+        ),
       ),
       body: Center(
-        child: Text('Portofolio'),
+        child: Text(
+          'Portofolio',
+          style: titleTextStyle,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -93,8 +105,8 @@ class _PortofolioPageState extends State<PortofolioPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.blue[100],
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.green[100],
         onTap: _onItemTapped,
       ),
     );

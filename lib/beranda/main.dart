@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'notification_page.dart';
 import 'topup_page.dart';
-import 'withdraw_page.dart';
+import 'tarikdana_page.dart';
 import '../marketplace/marketplace_page.dart';
 import '../portofolio/portofolio_page.dart';
 import '../profil/profil_page.dart';
+import '../assets/font.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,14 +19,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Beranda',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomePage(),
       routes: {
         '/notification': (context) => NotificationPage(),
         '/topup': (context) => TopUpPage(),
-        '/withdraw': (context) => WithdrawPage(),
+        '/withdraw': (context) => TarikDanaPage(),
         '/marketplace': (context) => MarketplacePage(),
         '/portofolio': (context) => PortofolioPage(),
         '/profil': (context) => ProfilPage(),
@@ -43,9 +44,14 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
 
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
@@ -68,14 +74,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Beranda'),
+        title: Text(
+          'Beranda',
+          style: titleTextStyle,
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -85,13 +94,13 @@ class _HomePageState extends State<HomePage> {
                         backgroundImage: AssetImage('assets/profile_pic.jpg'),
                         radius: 40,
                       ),
-                      SizedBox(width: 16.0),
+                      SizedBox(width: 24.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Nama Pengguna',
-                            style: TextStyle(fontSize: 20.0),
+                            style: bodyTextStyle,
                           ),
                         ],
                       ),
@@ -107,10 +116,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(24.0),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -121,13 +130,13 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Saldo Anda',
-                                  style: TextStyle(fontSize: 20.0),
+                                  'Saldo',
+                                  style: bodyBoldTextStyle,
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
                                   'Rp 1.000.000',
-                                  style: TextStyle(fontSize: 14.0),
+                                  style: bodyTextStyle,
                                 ),
                               ],
                             ),
@@ -174,31 +183,35 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        'Laporan Keuangan',
-                        style: TextStyle(fontSize: 20.0),
-                      ),
-                      SizedBox(height: 16.0),
-                      Text(
-                        'Belum ada laporan',
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ],
+                child: Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Text(
+                          'Laporan Keuangan',
+                          style: bodyBoldTextStyle,
+                        ),
+                        SizedBox(height: 24.0),
+                        Text(
+                          'Belum ada laporan',
+                          style: bodyTextStyle,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -209,12 +222,12 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               'Total Pendanaan',
-                              style: TextStyle(fontSize: 20.0),
+                              style: bodyBoldTextStyle,
                             ),
                             SizedBox(height: 8.0),
                             Text(
                               'Rp 1.000.000',
-                              style: TextStyle(fontSize: 18.0),
+                              style: bodyTextStyle,
                             ),
                           ],
                         ),
@@ -226,12 +239,12 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               'Bagi Hasil',
-                              style: TextStyle(fontSize: 20.0),
+                              style: bodyBoldTextStyle,
                             ),
                             SizedBox(height: 8.0),
                             Text(
                               'Rp 1.000.000',
-                              style: TextStyle(fontSize: 18.0),
+                              style: bodyTextStyle,
                             ),
                           ],
                         ),
@@ -264,9 +277,9 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors
-            .blue[100], // Set a very light blue color for unselected items
+            .green[100], // Set a very light green color for unselected items
         onTap: _onItemTapped,
       ),
     );

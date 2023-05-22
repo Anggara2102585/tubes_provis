@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../marketplace/marketplace_page.dart';
 import '../portofolio/portofolio_page.dart';
 import '../beranda/main.dart';
+import '../assets/font.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Beranda',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialRoute: '/', // Set the initial route to '/beranda'
@@ -43,9 +44,14 @@ class _ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
 
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
@@ -68,10 +74,16 @@ class _ProfilPageState extends State<ProfilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profil'),
+        title: Text(
+          'Profil',
+          style: titleTextStyle,
+        ),
       ),
       body: Center(
-        child: Text('Profil'),
+        child: Text(
+          'Profil',
+          style: titleTextStyle,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -93,8 +105,8 @@ class _ProfilPageState extends State<ProfilPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.blue[100],
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.green[100],
         onTap: _onItemTapped,
       ),
     );

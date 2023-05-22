@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../assets/font.dart';
 
 class NotificationPage extends StatelessWidget {
   final List<NotificationItem> notifications = [
@@ -23,29 +24,31 @@ class NotificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifikasi'),
+        title: Text(
+          'Notifikasi',
+          style: titleTextStyle,
+        ),
       ),
-      body: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (BuildContext context, int index) {
+      body: ListView(
+        children: notifications.map((notification) {
           return ListTile(
-            title: Text(notifications[index].subject),
-            subtitle: Text(notifications[index].body),
+            title: Text(notification.subject),
+            subtitle: Text(notification.body),
             trailing: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${notifications[index].dateTime.day}/${notifications[index].dateTime.month}/${notifications[index].dateTime.year}',
+                  '${notification.dateTime.day}/${notification.dateTime.month}/${notification.dateTime.year}',
                   style: TextStyle(fontSize: 12),
                 ),
                 Text(
-                  '${notifications[index].dateTime.hour}:${notifications[index].dateTime.minute}',
+                  '${notification.dateTime.hour}:${notification.dateTime.minute}',
                   style: TextStyle(fontSize: 12),
                 ),
               ],
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }
