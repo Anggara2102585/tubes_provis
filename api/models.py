@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, Text, Numeric, DateTime
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from database import Base
 
 
 class Dompet(Base):
@@ -26,12 +26,12 @@ class Umkm(Base):
     telp = Column(String)
     deskripsi_umkm = Column(Text)
     limit_pinjaman = Column(Numeric(precision=15, scale=2))
-    omzet = Column(Numeric(precision=15, scale=2))
+    omzet = Column(Numeric(precision=15, scale=2))  # per tahun
     id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
 
     dompet = relationship("Dompet", back_populates="umkm")
     pendanaan = relationship("Pendanaan", back_populates="umkm")
-    notifikasi = relationship("Notifikasi", secondary="umkm_notifikasi", back_populates="umkm")
+    umkm_notifikasi = relationship("UmkmNotifikasi", back_populates="umkm")
 
 class Pendanaan(Base):
     __tablename__ = "pendanaan"
@@ -67,17 +67,17 @@ class RiwayatTransaksi(Base):
 
     dompet = relationship("Dompet", back_populates="riwayat_transaksi")
 
-class Notifikasi(Base):
-    __tablename__ = "notifikasi"
+# class Notifikasi(Base):
+#     __tablename__ = "notifikasi"
 
-    id_notifikasi = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    judul_notifikasi = Column(String)
-    isi_notifikasi = Column(Text)
-    waktu_tanggal = Column(DateTime)
-    is_terbaca = Column(Boolean, default=False)
+#     id_notifikasi = Column(Integer, primary_key=True, index=True, autoincrement=True)
+#     judul_notifikasi = Column(String)
+#     isi_notifikasi = Column(Text)
+#     waktu_tanggal = Column(DateTime)
+#     is_terbaca = Column(Boolean, default=False)
 
-    umkm = relationship("Umkm", secondary="umkm_notifikasi", back_populates="notifikasi")
-    pendana = relationship("Pendana", secondary="pendana_notifikasi", back_populates="notifikasi")
+#     umkm = relationship("Umkm", secondary="umkm_notifikasi", back_populates="notifikasi")
+#     pendana = relationship("Pendana", secondary="pendana_notifikasi", back_populates="notifikasi")
 
 class Pendana(Base):
     __tablename__ = "pendana"
@@ -89,31 +89,44 @@ class Pendana(Base):
 
     dompet = relationship("Dompet", back_populates="pendana")
     pendanaan = relationship("Pendanaan", secondary="pendanaan_pendana", back_populates="pendana")
-    notifikasi = relationship("Notifikasi", secondary="pendana_notifikasi", back_populates="pendana")
+    pendana_notifikasi = relationship("PendanaNotifikasi", back_populates="pendana")
 
-# table many to many Umkm - Notifikasi
+# table one to many Umkm - Notifikasi
 class UmkmNotifikasi(Base):
     __tablename__ = "umkm_notifikasi"
 
     id_umkm_notifikasi = Column(Integer, primary_key=True, index=True, autoincrement=True)
     id_umkm = Column(Integer, ForeignKey("umkm.id_umkm"))
-    id_notifikasi = Column(Integer, ForeignKey("notifikasi.id_notifikasi"))
+    # id_notifikasi = Column(Integer, ForeignKey("notifikasi.id_notifikasi"))
+    judul_notifikasi = Column(String)
+    isi_notifikasi = Column(Text)
+    waktu_tanggal = Column(DateTime)
+    is_terbaca = Column(Boolean, default=False)
 
-# table many to many Pendana - Notifikasi
+    umkm = relationship("Umkm", back_populates="umkm_notifikasi")
+
+# table one to many Pendana - Notifikasi
 class PendanaNotifikasi(Base):
     __tablename__ = "pendana_notifikasi"
 
     id_pendana_notifikasi = Column(Integer, primary_key=True, index=True, autoincrement=True)
     id_pendana = Column(Integer, ForeignKey("pendana.id_pendana"))
-    id_notifikasi = Column(Integer, ForeignKey("notifikasi.id_notifikasi"))
+    # id_notifikasi = Column(Integer, ForeignKey("notifikasi.id_notifikasi"))
+    judul_notifikasi = Column(String)
+    isi_notifikasi = Column(Text)
+    waktu_tanggal = Column(DateTime)
+    is_terbaca = Column(Boolean, default=False)
 
-# table many to many RiwayatTransaksi - Dompet
-class DompetRiwayatTransaksi(Base):
-    __tablename__ = "dompet_riwayat_transaksi"
+    pendana = relationship("Pendana", back_populates="pendana_notifikasi")
+    
 
-    id_dompet_riwayat_transaksi = Column(Integer, primary_key=True, autoincrement=True)
-    id_riwayat_transaksi = Column(Integer,ForeignKey("RiwayatTransaksi.id_riwayat_transaksi"))
-    id_dompet = Column(Integer, ForeignKey("Dompet.id_dompet"))
+# # table many to many RiwayatTransaksi - Dompet
+# class DompetRiwayatTransaksi(Base):
+#     __tablename__ = "dompet_riwayat_transaksi"
+
+#     id_dompet_riwayat_transaksi = Column(Integer, primary_key=True, autoincrement=True)
+#     id_riwayat_transaksi = Column(Integer,ForeignKey("RiwayatTransaksi.id_riwayat_transaksi"))
+#     id_dompet = Column(Integer, ForeignKey("Dompet.id_dompet"))
 
 # table many to many Pendanaan - Pendana
 class PendanaanPendana(Base):
