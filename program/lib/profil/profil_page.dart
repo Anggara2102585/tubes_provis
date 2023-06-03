@@ -4,6 +4,7 @@ import '../portofolio/portofolio_page.dart';
 import '../beranda/main.dart';
 import '../assets/font.dart';
 import 'package:myapp/profil/pusatbantuan_page.dart';
+import 'package:myapp/profil/edit_profil2.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         '/portofolio': (context) => PortofolioPage(),
         '/profil': (context) => const ProfilPage(),
         '/pusatbantuan': (contex) => const PusatBantuanPage(),
+        '/edit_profil': (contex) => const EditProfilPage(),
       },
     );
   }

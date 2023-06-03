@@ -11,11 +11,6 @@ void main() {
   runApp(MyApp());
 }
 
-class ProfilPage extends StatefulWidget {
-  @override
-  _ProfilPageState createState() => _ProfilPageState();
-}
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -31,18 +26,18 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomePage(),
         '/marketplace': (context) => MarketplacePage(),
         '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => ProfilPage(),
+        '/profil': (context) => ProfilPage2(),
       },
     );
   }
 }
 
-class ProfilStatePage extends StatefulWidget {
+class ProfilPage2 extends StatefulWidget {
   @override
-  _ProfilPageState createState() => _ProfilPageState();
+  _ProfilPage2State createState() => _ProfilPage2State();
 }
 
-class _ProfilPageState extends State<ProfilPage> {
+class _ProfilPage2State extends State<ProfilPage2> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
 
   void _onItemTapped(int index) {
@@ -82,9 +77,12 @@ class _ProfilPageState extends State<ProfilPage> {
         ),
       ),
       body: Center(
-          child: CircleAvatar(
-        backgroundImage: AssetImage('assets/user.jpg'),
-      )),
+        child: _FormEditCard(
+          userName: 'John Doe',
+          userPhone: '081221',
+          userEmail: 'john@mail.com'
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -113,7 +111,7 @@ class _ProfilPageState extends State<ProfilPage> {
   }
 }
 
-class _EditProfilPage extends StatelessWidget {
+class EditProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -177,19 +175,19 @@ class _FormEditCard extends StatelessWidget {
                     decoration: InputDecoration(
                         labelText: 'Email', hintText: userEmail),
                   ),
-                  FormBuilder(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        FormBuilderImagePicker(
-                          name: 'noCamera',
-                          availableImageSources: const [
-                            ImageSourceOption.gallery
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                  // FormBuilder(
+                  //   child: Column(
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     children: <Widget>[
+                  //       FormBuilderImagePicker(
+                  //         name: 'noCamera',
+                  //         availableImageSources: const [
+                  //           ImageSourceOption.gallery
+                  //         ],
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             )
