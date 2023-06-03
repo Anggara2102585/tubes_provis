@@ -3,11 +3,17 @@ import '../marketplace/marketplace_page.dart';
 import '../portofolio/portofolio_page.dart';
 import '../beranda/main.dart';
 import '../assets/font.dart';
-import 'package:myapp/profil/pusatbantuan_page.dart';
+import 'profil_page.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
+}
+
+class ProfilPage extends StatefulWidget {
+  @override
+  _ProfilPageState createState() => _ProfilPageState();
 }
 
 class MyApp extends StatelessWidget {
@@ -25,21 +31,18 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomePage(),
         '/marketplace': (context) => MarketplacePage(),
         '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => const ProfilPage(),
-        '/pusatbantuan': (contex) => const PusatBantuanPage(),
+        '/profil': (context) => ProfilPage(),
       },
     );
   }
 }
 
-class ProfilPage extends StatefulWidget {
-  const ProfilPage({super.key});
-
+class ProfilStatePage extends StatefulWidget {
   @override
-  ProfilPageState createState() => ProfilPageState();
+  _ProfilPageState createState() => _ProfilPageState();
 }
 
-class ProfilPageState extends State<ProfilPage> {
+class _ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
 
   void _onItemTapped(int index) {
@@ -78,10 +81,10 @@ class ProfilPageState extends State<ProfilPage> {
           style: titleTextStyle,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _ProfilPageContent(),
-      ),
+      body: Center(
+          child: CircleAvatar(
+        backgroundImage: AssetImage('assets/user.jpg'),
+      )),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -110,62 +113,40 @@ class ProfilPageState extends State<ProfilPage> {
   }
 }
 
-class _ProfilPageContent extends StatelessWidget {
+class _EditProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
-          // SizedBox(height: 16.0),
           const SizedBox(
-            width: double.infinity, // Set the container width to fit the screen
-            child: _ProfileCard(
-              profileImage: 'https://placehold.co/400x400.png',
-              userName: 'John Doe',
+            width: double.infinity,
+            child: CircleAvatar(
+              backgroundImage: AssetImage('../assets/user.jpg'),
             ),
           ),
-          ListTile(
-            title: const Text('Akun'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              Navigator.pushNamed(context, '/edit_profil');
-              // Handle 'Akun' button tap
-              // Navigate to Akun page
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Pusat Bantuan'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              Navigator.pushNamed(context, '/pusatbantuan');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text(
-              'Keluar',
-              style: TextStyle(color: Colors.red),
-            ),
-            trailing: const Icon(Icons.exit_to_app, color: Colors.red),
-            onTap: () {
-              // Handle 'Keluar' button tap
-              // Perform logout action
-            },
-          ),
+          SizedBox(
+            width: double.infinity,
+            child: _FormEditCard(
+                userName: 'John Doe',
+                userPhone: '081221',
+                userEmail: 'john@mail.com'),
+          )
         ],
       ),
     );
   }
 }
 
-class _ProfileCard extends StatelessWidget {
-  final String profileImage;
+class _FormEditCard extends StatelessWidget {
   final String userName;
+  final String userPhone;
+  final String userEmail;
 
-  const _ProfileCard({
-    required this.profileImage,
+  const _FormEditCard({
     required this.userName,
+    required this.userPhone,
+    required this.userEmail,
   });
 
   @override
@@ -176,22 +157,42 @@ class _ProfileCard extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              width: 120.0,
-              height: 120.0,
+              width: double.infinity,
+              height: double.infinity,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Theme.of(context).primaryColor),
               ),
-              child: CircleAvatar(
-                backgroundImage: NetworkImage(profileImage),
+              child: Column(
+                children: [
+                  TextFormField(
+                    decoration:
+                        InputDecoration(labelText: 'Nama', hintText: userName),
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: 'No Telepon', hintText: userPhone),
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: 'Email', hintText: userEmail),
+                  ),
+                  FormBuilder(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        FormBuilderImagePicker(
+                          name: 'noCamera',
+                          availableImageSources: const [
+                            ImageSourceOption.gallery
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              userName,
-              style:
-                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            ),
+            )
           ],
         ),
       ),
