@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -6,8 +7,7 @@ from datetime import datetime
 class RiwayatTransaksiBase(BaseModel):
     id_dompet: int
     jenis_transaksi: int = Field(ge=1, le=6)
-    nominal: float
-    tanggal: datetime
+    nominal: Decimal
     keterangan: Optional[str] = Field("-")
 
 class RiwayatTransaksiCreate(RiwayatTransaksiBase):
@@ -15,13 +15,14 @@ class RiwayatTransaksiCreate(RiwayatTransaksiBase):
 
 class RiwayatTransaksi(RiwayatTransaksiBase):
     id_riwayat_transaksi: int
+    tanggal: datetime
 
     class Config:
         orm_mode = True
 
 
 class DompetBase(BaseModel):
-    saldo: Optional[float] = 0.0
+    saldo: Optional[Decimal] = 0.0
 
 class DompetCreate(DompetBase):
     pass
@@ -32,6 +33,23 @@ class Dompet(DompetBase):
 
     class Config:
         orm_mode = True
+
+
+class AkunBase(BaseModel):
+    username: str
+    password: str
+    foto_ktp: str
+    foto_selfie: str
+
+class AkunCreate(AkunBase):
+    pass
+
+class AkunUpdate(BaseModel):
+    username: Optional[str]
+    password: Optional[str]
+
+class Akun(AkunBase):
+    id_dompet: int
 
 
 class NotifikasiBase(BaseModel):
@@ -86,19 +104,30 @@ class UmkmBase(BaseModel):
     # rating: float
     alamat_usaha: str
     telp: str
+    email: str
     deskripsi_umkm: str
-    # limit_pinjaman: float
-    omzet: float # per tahun
+    # limit_pinjaman: Decimal
+    omzet: Decimal # per tahun
 
 class UmkmCreate(UmkmBase):
     pass
 
+class UmkmUpdate(UmkmBase):
+    rating: float
+    limit_pinjaman: Optional[Decimal]
+    # dompet: Optional[Dompet]
+
+    class Config:
+        orm_mode = True
+
 class Umkm(UmkmBase):
     id_umkm: int
     rating: float
-    limit_pinjaman: float
+    limit_pinjaman: Decimal
     id_dompet: int
+    id_akun: int
     dompet: Dompet
+    akun: Akun
     # pendanaan: List['Pendanaan'] = []
     umkm_notifikasi: List[UmkmNotifikasi] = []
 
@@ -110,6 +139,9 @@ class PendanaBase(BaseModel):
     foto_profil: str                                    # Encoding di frontend atau backend?
     nama_pendana: str
     # id_dompet: int
+    alamat: str
+    telp: str
+    email: str
 
 class PendanaCreate(PendanaBase):
     pass
@@ -117,6 +149,7 @@ class PendanaCreate(PendanaBase):
 class Pendana(PendanaBase):
     id_pendana: int
     id_dompet: int
+    id_akun: int
     dompet: Dompet
     # pendanaan: List[Pendanaan] = []
     pendana_notifikasi: List[PendanaNotifikasi] = []
@@ -130,10 +163,10 @@ class PendanaanBase(BaseModel):
     # kode_pendanaan: str
     # pendanaan_ke: int
     # status_pendanaan: int
-    total_pendanaan: float
-    # dana_masuk: float = Field(0.0)
+    total_pendanaan: Decimal
+    # dana_masuk: Decimal = Field(0.0)
     imba_hasil: int = Field(ge=0, le=100)
-    minimal_pendanaan: float
+    minimal_pendanaan: Decimal
     dl_penggalangan: datetime                  #set sehingga input harus lebih dari hari ini
     dl_bagi_hasil: datetime                    #set sehingga input harus lebih dari hari ini
     deskripsi_pendanaan: str
@@ -148,7 +181,7 @@ class Pendanaan(PendanaanBase):
     kode_pendanaan: str
     pendanaan_ke: int
     status_pendanaan: int
-    dana_masuk: float
+    dana_masuk: Decimal
     tanggal_pengajuan: datetime
     tanggal_selesai: Optional[datetime]
     umkm: Umkm

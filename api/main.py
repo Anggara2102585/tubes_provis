@@ -3,6 +3,7 @@ TODO:
 - kirim uang ke saldo UMKM ketika status pendanaan berubah ke 3
 """
 from datetime import datetime
+from decimal import Decimal
 from typing import List
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session, joinedload
@@ -48,11 +49,21 @@ def get_all_dompet(db: Session = Depends(get_db)):
     dompet = db.query(models.Dompet).all()
     return dompet
 
+# Dompet - Delete
+@app.delete("/dompet/{dompet_id}")
+def delete_dompet(dompet_id: int, db: Session = Depends(get_db)):
+    db_dompet = db.query(models.Dompet).filter(models.Dompet.id_dompet == dompet_id).first()
+    if not db_dompet:
+        raise HTTPException(status_code=404, detail="Dompet not found")
+    db.delete(db_dompet)
+    db.commit()
+    return {"message": "Dompet deleted successfully"}
 
 # RiwayatTransaksi - Create (POST)
 @app.post("/riwayat_transaksi/", response_model=schemas.RiwayatTransaksi)
 def create_riwayat_transaksi(riwayat_transaksi: schemas.RiwayatTransaksiCreate, db: Session = Depends(get_db)):
     db_riwayat_transaksi = models.RiwayatTransaksi(**riwayat_transaksi.dict())
+    db_riwayat_transaksi.tanggal = datetime.now()
 
     db.add(db_riwayat_transaksi)
     db.commit()
@@ -62,6 +73,7 @@ def create_riwayat_transaksi(riwayat_transaksi: schemas.RiwayatTransaksiCreate, 
 @app.post("/riwayat_transaksi/cascade", response_model=schemas.RiwayatTransaksi)
 def create_riwayat_transaksi_cascade(riwayat_transaksi: schemas.RiwayatTransaksiCreate, db: Session = Depends(get_db)):
     db_riwayat_transaksi = models.RiwayatTransaksi(**riwayat_transaksi.dict())
+    db_riwayat_transaksi.tanggal = datetime.now()
 
     if riwayat_transaksi.jenis_transaksi in [1, 2, 3]:
         # Add the nominal amount to the Dompet's saldo
@@ -97,6 +109,12 @@ def create_riwayat_transaksi_cascade(riwayat_transaksi: schemas.RiwayatTransaksi
     db.refresh(db_riwayat_transaksi)
     return db_riwayat_transaksi
 
+# RiwayatTransaksi - Read (GET)
+@app.get("/riwayat_transaksi/", response_model=List[schemas.RiwayatTransaksi])
+def get_all_riwayat_transaksi(db: Session = Depends(get_db)):
+    db_riwayat_transaksi = db.query(models.RiwayatTransaksi).all()
+    return db_riwayat_transaksi
+
 
 # UMKM - Create (POST)
 @app.post("/umkm", response_model=schemas.Umkm)
@@ -110,7 +128,7 @@ def create_umkm(umkm: schemas.UmkmCreate, db: Session = Depends(get_db)):
     db_umkm = models.Umkm(**umkm.dict())  # Create a new Umkm instance with the provided data
     db_umkm.id_dompet = db_dompet.id_dompet
     db_umkm.rating = 0.0
-    db_umkm.limit_pinjaman = db_umkm.omzet*(8/10) / 12 # 80% omzet tahunan / 12 [bulan]
+    db_umkm.limit_pinjaman = db_umkm.omzet*(Decimal(8)/Decimal(10)) / 12 # 80% omzet tahunan / 12 [bulan]
 
     db.add(db_umkm)  # Add the Umkm instance to the database session
     db.commit()  # Commit the changes to the database to persist the new Umkm record
@@ -126,13 +144,13 @@ def read_umkm(umkm_id: int, db: Session = Depends(get_db)):
     return db_umkm
 
 @app.get("/umkm/", response_model=List[schemas.Umkm])
-def get_all_umkms(db: Session = Depends(get_db)):
+def get_all_umkm(db: Session = Depends(get_db)):
     umkms = db.query(models.Umkm).all()
     return umkms
 
 # UMKM - Update (PUT)
 @app.put("/umkm/{umkm_id}", response_model=schemas.Umkm)
-def update_umkm(umkm_id: int, umkm: schemas.Umkm, db: Session = Depends(get_db)):
+def update_umkm(umkm_id: int, umkm: schemas.UmkmUpdate, db: Session = Depends(get_db)):
     db_umkm = db.query(models.Umkm).filter(models.Umkm.id_umkm == umkm_id).first()
     if not db_umkm:
         raise HTTPException(status_code=404, detail="UMKM not found")
@@ -243,7 +261,7 @@ def create_pendanaan(pendanaan: schemas.PendanaanCreate, db: Session = Depends(g
     if last_pendanaan:
         pendanaan_ke = last_pendanaan.pendanaan_ke + 1
     else:
-        pendanaan_ke = 0
+        pendanaan_ke = 1
     
     # Generate kode_pendanaan by concatenating the name of the UMKM with pendanaan_ke
     umkm = db.query(models.Umkm).filter(models.Umkm.id_umkm == pendanaan.id_umkm).first()
@@ -328,7 +346,7 @@ def delete_pendanaan(pendanaan_id: int, db: Session = Depends(get_db)):
 
 # UmkmNotifikasi - Create (POST)
 @app.post("/umkm_notifikasi/", response_model=schemas.UmkmNotifikasi)
-def create_notifikasi(
+def create_umkm_notifikasi(
     notifikasi: schemas.UmkmNotifikasiCreate,
     db: Session = Depends(get_db)
 ):
@@ -371,18 +389,18 @@ def create_notifikasi(
     
 # UmkmNotifikasi - Read (GET)
 @app.get("/umkm_notifikasi/{id_umkm}", response_model=List[schemas.UmkmNotifikasi])
-def read_notifikasi(id_umkm: int, db: Session = Depends(get_db)):
+def read_umkm_notifikasi(id_umkm: int, db: Session = Depends(get_db)):
     db_umkm_notifikasi = db.query(models.UmkmNotifikasi).filter(models.UmkmNotifikasi.id_umkm == id_umkm).all()
     return db_umkm_notifikasi
 
 @app.get("/umkm_notifikasi/", response_model=List[schemas.UmkmNotifikasi])
-def get_all_notifikasi(db: Session = Depends(get_db)):
+def get_all_umkm_notifikasi(db: Session = Depends(get_db)):
     notifikasi = db.query(models.UmkmNotifikasi).all()
     return notifikasi
 
 # Notifikasi - Update (PUT)
 @app.put("/umkm_notifikasi/{id_umkm}", response_model=schemas.UmkmNotifikasi)
-def update_notifikasi(id_umkm: int, db: Session = Depends(get_db)):
+def update_umkm_notifikasi(id_umkm: int, db: Session = Depends(get_db)):
     db_umkm_notifikasi = db.query(models.UmkmNotifikasi).filter(models.UmkmNotifikasi.id_umkm == id_umkm).all()
     for notification in db_umkm_notifikasi:
         notification.is_terbaca = True
@@ -404,7 +422,7 @@ def update_notifikasi(id_umkm: int, db: Session = Depends(get_db)):
 
 # UmkmNotifikasi - Delete
 @app.delete("/umkm_notifikasi/{id_notifikasi}")
-def delete_notifikasi(id_notifikasi: int, db: Session = Depends(get_db)):
+def delete_umkm_notifikasi(id_notifikasi: int, db: Session = Depends(get_db)):
     db_notifikasi = db.query(models.UmkmNotifikasi).filter(models.UmkmNotifikasi.id_umkm_notifikasi == id_notifikasi).first()
     if not db_notifikasi:
         raise HTTPException(status_code=404, detail="Notification not found")
@@ -415,10 +433,7 @@ def delete_notifikasi(id_notifikasi: int, db: Session = Depends(get_db)):
 
 # PendanaNotifikasi - Create (POST)
 @app.post("/pendana_notifikasi/", response_model=schemas.PendanaNotifikasi)
-def create_notifikasi(
-    notifikasi: schemas.PendanaNotifikasiCreate,
-    db: Session = Depends(get_db)
-):
+def create_pendana_notifikasi(notifikasi: schemas.PendanaNotifikasiCreate, db: Session = Depends(get_db)):
     target_users = notifikasi.list_id_pendana
     notifications = []
 
@@ -453,18 +468,18 @@ def create_notifikasi(
     
 # PendanaNotifikasi - Read (GET)
 @app.get("/pendana_notifikasi/{id_pendana}", response_model=List[schemas.PendanaNotifikasi])
-def read_notifikasi(id_pendana: int, db: Session = Depends(get_db)):
+def read_pendana_notifikasi(id_pendana: int, db: Session = Depends(get_db)):
     db_pendana_notifikasi = db.query(models.PendanaNotifikasi).filter(models.PendanaNotifikasi.id_pendana == id_pendana).all()
     return db_pendana_notifikasi
 
 @app.get("/pendana_notifikasi/", response_model=List[schemas.PendanaNotifikasi])
-def get_all_notifikasi(db: Session = Depends(get_db)):
+def get_all_pendana_notifikasi(db: Session = Depends(get_db)):
     notifikasi = db.query(models.PendanaNotifikasi).all()
     return notifikasi
 
 # Notifikasi - Update (PUT)
 @app.put("/pendana_notifikasi/{id_pendana}", response_model=schemas.PendanaNotifikasi)
-def update_notifikasi(id_pendana: int, db: Session = Depends(get_db)):
+def update_pendana_notifikasi(id_pendana: int, db: Session = Depends(get_db)):
     db_pendana_notifikasi = db.query(models.PendanaNotifikasi).filter(models.PendanaNotifikasi.id_pendana == id_pendana).all()
     for notification in db_pendana_notifikasi:
         notification.is_terbaca = True
@@ -476,7 +491,7 @@ def update_notifikasi(id_pendana: int, db: Session = Depends(get_db)):
 
 # PendanaNotifikasi - Delete
 @app.delete("/pendana_notifikasi/{id_notifikasi}")
-def delete_notifikasi(id_notifikasi: int, db: Session = Depends(get_db)):
+def delete_pendana_notifikasi(id_notifikasi: int, db: Session = Depends(get_db)):
     db_notifikasi = db.query(models.PendanaNotifikasi).filter(models.PendanaNotifikasi.id_pendana_notifikasi == id_notifikasi).first()
     if not db_notifikasi:
         raise HTTPException(status_code=404, detail="Notification not found")

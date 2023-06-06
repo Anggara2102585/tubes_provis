@@ -12,7 +12,19 @@ class Dompet(Base):
 
     umkm = relationship("Umkm", uselist=False, back_populates="dompet")
     pendana = relationship("Pendana", uselist=False, back_populates="dompet")
-    riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="dompet")
+    riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="dompet", cascade="all, delete-orphan")
+
+class Akun(Base):
+    __tablename__ = "akun"
+
+    id_akun = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    username = Column(String, unique=True)
+    password = Column(String)
+    foto_ktp = Column(String, unique=True)
+    foto_selfie = Column(String, unique=True)
+
+    umkm = relationship("Umkm", uselist=False, back_populates="akun")
+    pendana = relationship("Pendana", uselist=False, back_populates="akun")
 
 class Umkm(Base):
     __tablename__ = "umkm"
@@ -28,10 +40,13 @@ class Umkm(Base):
     limit_pinjaman = Column(Numeric(precision=15, scale=2))
     omzet = Column(Numeric(precision=15, scale=2))  # per tahun
     id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
+    id_akun = Column(Integer, ForeignKey("akun.id_akun"))
+    email = Column(String)
 
-    dompet = relationship("Dompet", back_populates="umkm")
+    dompet = relationship("Dompet", back_populates="umkm", cascade="all")
+    akun = relationship("Akun", back_populates="umkm", cascade="all")
     pendanaan = relationship("Pendanaan", back_populates="umkm")
-    umkm_notifikasi = relationship("UmkmNotifikasi", back_populates="umkm")
+    umkm_notifikasi = relationship("UmkmNotifikasi", back_populates="umkm", cascade="all")
 
 class Pendanaan(Base):
     __tablename__ = "pendanaan"
@@ -65,7 +80,7 @@ class RiwayatTransaksi(Base):
     tanggal = Column(DateTime)
     keterangan = Column(String)
 
-    dompet = relationship("Dompet", back_populates="riwayat_transaksi")
+    dompet = relationship("Dompet", back_populates="riwayat_transaksi", cascade="all")
 
 # class Notifikasi(Base):
 #     __tablename__ = "notifikasi"
@@ -86,10 +101,15 @@ class Pendana(Base):
     foto_profil = Column(String, unique=True)
     nama_pendana = Column(String)
     id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
+    id_akun = Column(Integer, ForeignKey("akun.id_akun"))
+    alamat = Column(String)
+    telp = Column(String)
+    email = Column(String)
 
-    dompet = relationship("Dompet", back_populates="pendana")
+    dompet = relationship("Dompet", back_populates="pendana", cascade="all")
+    akun = relationship("Akun", back_populates="umkm", cascade="all")
     pendanaan = relationship("Pendanaan", secondary="pendanaan_pendana", back_populates="pendana")
-    pendana_notifikasi = relationship("PendanaNotifikasi", back_populates="pendana")
+    pendana_notifikasi = relationship("PendanaNotifikasi", back_populates="pendana", cascade="all")
 
 # table one to many Umkm - Notifikasi
 class UmkmNotifikasi(Base):
@@ -135,6 +155,8 @@ class PendanaanPendana(Base):
     id_pendanaan_pendana = Column(Integer, primary_key=True,autoincrement=True)
     id_pendanaan = Column(Integer, ForeignKey("pendanaan.id_pendanaan"))
     id_pendana = Column(Integer, ForeignKey("pendana.id_pendana"))
+    jumlah_danai = Column(Numeric(precision=15,scale=2))
+    tanggal_danai = Column(DateTime)
     
     # pendanaan = relationship("Pendanaan", back_populates="pendanaan_pendana")
     # pendana = relationship("Pendana", back_populates="pendanaan_pendana")
