@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../assets/font.dart';
+import 'package:myapp/assets/font.dart';
 
 enum MetodePusatBantuan { transferBank, eWallet }
 
 class PusatBantuanPage extends StatefulWidget {
   const PusatBantuanPage({Key? key}) : super(key: key);
-  
+
   @override
   PusatBantuanPageState createState() => PusatBantuanPageState();
   Widget build(BuildContext context) {
@@ -26,40 +26,43 @@ class PusatBantuanPageState extends State<PusatBantuanPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: Directionality(
         textDirection: TextDirection.ltr,
         child: DefaultTabController(
           length: 2,
           child: Scaffold(
-            appBar: AppBar(
-              title: Text(
-                'Pusat Bantuan',
-                style: titleTextStyle,
-              ),
-              backgroundColor: Colors.green,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              bottom: const TabBar(
-                tabs: [
-                  Tab(text: 'Customer Service'),
-                  Tab(text: 'Panduan & Tutorial'),
-                ],
-              ),
-            ),
-            body: TabBarView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: _CustomerService(),
+              appBar: AppBar(
+                title: Text(
+                  'Pusat Bantuan',
+                  style: titleTextStyle,
                 ),
-                _PanduanTutorial(),
-              ],
-            )
-          ),
+                // backgroundColor: Colors.green,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                bottom: const TabBar(
+                  tabs: [
+                    Tab(text: 'Customer Service'),
+                    Tab(text: 'Panduan & Tutorial'),
+                  ],
+                ),
+              ),
+              body: TabBarView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: _CustomerService(),
+                  ),
+                  _PanduanTutorial(),
+                ],
+              )),
         ),
       ),
     );
@@ -163,7 +166,8 @@ class _PanduanTutorial extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       video['title'],
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

@@ -1,20 +1,22 @@
-import 'dart:io';
-
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:html' as html;
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:image_crop/image_crop.dart' as crop;
+import 'package:image_picker_web/image_picker_web.dart';
 
-class EditProfilPage extends StatefulWidget {
-  const EditProfilPage({Key? key}) : super(key: key);
+class EditProfilePage extends StatefulWidget {
+  const EditProfilePage({Key? key}) : super(key: key);
 
   @override
-  _EditProfilPageState createState() => _EditProfilPageState();
+  _EditProfilePageState createState() => _EditProfilePageState();
 }
 
-class _EditProfilPageState extends State<EditProfilPage> {
+class _EditProfilePageState extends State<EditProfilePage> {
   bool isEditMode = false;
-  File? _selectedImage;
-  
+  Uint8List? _selectedImage;
+  final ImagePickerWeb _imagePicker = ImagePickerWeb();
+
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -23,31 +25,57 @@ class _EditProfilPageState extends State<EditProfilPage> {
   TextEditingController passwordController = TextEditingController();
 
   Future<void> _selectProfilePicture() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    final html.FileUploadInputElement input = html.FileUploadInputElement();
+    input.accept = 'image/*';
+    input.click();
 
-    if (pickedImage != null) {
-      final croppedImage = await _cropImage(pickedImage.path);
+    input.onChange.listen((event) {
+      final files = input.files;
+      if (files != null && files.isNotEmpty) {
+        final file = files[0];
+        final reader = html.FileReader();
 
-      if (croppedImage != null) {
-        setState(() {
-          _selectedImage = croppedImage;
+        reader.onLoad.listen((e) {
+          final imageBytes = reader.result as Uint8List;
+          setState(() {
+            _selectedImage = imageBytes;
+          });
         });
+
+        reader.readAsArrayBuffer(file);
       }
-    }
+    });
   }
 
-  Future<File?> _cropImage(String imagePath) async {
-    final croppedImage = await ImageCropper().cropImage(
-      sourcePath: imagePath,
-      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
-      compressQuality: 100,
-      maxWidth: 800,
-      maxHeight: 800,
-    );
+  // Future<Uint8List?> _cropImage(Uint8List? imageData) async {
+  //   if (imageData == null) return null;
 
-    return croppedImage;
-  }
+  //   final cropKey = GlobalKey<crop.ImageCropState>();
+  //   final aspectRatio = CropAspectRatio(aspectRatioX: 1, aspectRatioY: 1);
+  //   final croppedImage = await showDialog<Uint8List>(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: const Text('Crop Image'),
+  //         content: crop.ImageCrop(
+  //           key: cropKey,
+  //           image: imageData,
+  //           aspectRatio: aspectRatio,
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop(cropKey.currentState?.crop());
+  //             },
+  //             child: const Text('Crop'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+
+  //   return croppedImage;
+  // }
 
   @override
   void initState() {
@@ -77,11 +105,9 @@ class _EditProfilPageState extends State<EditProfilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Edit Profil',
-        ),
+        title: const Text('Edit Profile'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -98,7 +124,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
           ),
           if (isEditMode)
             IconButton(
-              icon: Icon(Icons.clear),
+              icon: const Icon(Icons.clear),
               onPressed: () {
                 setState(() {
                   isEditMode = false;
@@ -118,7 +144,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             GestureDetector(
               onTap: _selectProfilePicture,
               child: Container(
@@ -126,76 +152,78 @@ class _EditProfilPageState extends State<EditProfilPage> {
                   shape: BoxShape.circle,
                   border: Border.all(color: Theme.of(context).primaryColor),
                 ),
-                child: CircleAvatar(
-                  radius: 80,
-                  backgroundImage: _selectedImage != null
-                      ? FileImage(_selectedImage!)
-                      : NetworkImage('https://placehold.co/400x400.png') as ImageProvider<Object>,
-                ),
+                // child: CircleAvatar(
+                //   radius: 80,
+                //   backgroundImage: _selectedImage != null
+                //       ? MemoryImage(_selectedImage!)
+                //       : const NetworkImage('https://placehold.co/400x400.png'),
+                // ),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             isEditMode
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: TextField(
                       controller: nameController,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                   )
                 : Text(
                     nameController.text,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Card(
-              margin: EdgeInsets.symmetric(horizontal: 16),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(Icons.email),
-                    title: Text('Email'),
+                    leading: const Icon(Icons.email),
+                    title: const Text('Email'),
                     subtitle: isEditMode
                         ? TextField(
                             controller: emailController,
                           )
                         : Text(emailController.text),
                   ),
-                  Divider(),
+                  const Divider(),
                   ListTile(
-                    leading: Icon(Icons.phone),
-                    title: Text('Telp'),
+                    leading: const Icon(Icons.phone),
+                    title: const Text('Telp'),
                     subtitle: isEditMode
                         ? TextField(
                             controller: phoneController,
                           )
                         : Text(phoneController.text),
                   ),
-                  Divider(),
+                  const Divider(),
                   ListTile(
-                    leading: Icon(Icons.location_on),
-                    title: Text('Alamat'),
+                    leading: const Icon(Icons.location_on),
+                    title: const Text('Alamat'),
                     subtitle: isEditMode
                         ? TextField(
                             controller: addressController,
                           )
                         : Text(addressController.text),
                   ),
-                  Divider(),
+                  const Divider(),
                   ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('Username'),
+                    leading: const Icon(Icons.person),
+                    title: const Text('Username'),
                     subtitle: isEditMode
                         ? TextField(
                             controller: usernameController,
                           )
                         : Text(usernameController.text),
                   ),
-                  Divider(),
+                  const Divider(),
                   ListTile(
-                    leading: Icon(Icons.lock),
-                    title: Text('Password'),
+                    leading: const Icon(Icons.lock),
+                    title: const Text('Password'),
                     subtitle: isEditMode
                         ? TextField(
                             controller: passwordController,

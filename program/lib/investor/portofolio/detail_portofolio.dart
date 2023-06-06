@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'portofolio_page.dart';
 import '../../assets/font.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const DetailPortofolioPage());
-}
-
 class DetailPortofolioPage extends StatelessWidget {
   const DetailPortofolioPage({Key? key}) : super(key: key);
 

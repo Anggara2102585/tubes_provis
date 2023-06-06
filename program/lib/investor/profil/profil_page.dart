@@ -1,46 +1,14 @@
 import 'package:flutter/material.dart';
-import '../marketplace/marketplace_page.dart';
-import '../portofolio/portofolio_page.dart';
-import '../beranda/beranda.dart';
-import '../../assets/font.dart';
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
-}
+import 'package:myapp/assets/font.dart';
 
 class ProfilPage extends StatefulWidget {
+  const ProfilPage({super.key});
+
   @override
-  _ProfilPageState createState() => _ProfilPageState();
+  ProfilPageState createState() => ProfilPageState();
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/beranda', // Set the initial route to '/beranda'
-      routes: {
-        '/beranda': (context) => HomePage(),
-        '/marketplace': (context) => MarketplacePage(),
-        '/portofolio': (context) => PortofolioPage(),
-        // '/profil': (context) => ProfilPage(),
-      },
-    );
-  }
-}
-
-class ProfilStatePage extends StatefulWidget {
-  @override
-  _ProfilPageState createState() => _ProfilPageState();
-}
-
-class _ProfilPageState extends State<ProfilPage> {
+class ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
 
   void _onItemTapped(int index) {
@@ -56,8 +24,7 @@ class _ProfilPageState extends State<ProfilPage> {
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
       case 0:
-        Navigator.pushReplacementNamed(context,
-            '/beranda'); // Use pushReplacementNamed to replace the current page
+        Navigator.pushNamed(context, '/beranda');
         break;
       case 1:
         Navigator.pushReplacementNamed(context, '/marketplace');
@@ -79,11 +46,9 @@ class _ProfilPageState extends State<ProfilPage> {
           style: titleTextStyle,
         ),
       ),
-      body: Center(
-        child: Text(
-          'Profil',
-          style: titleTextStyle,
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _ProfilPageContent(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -108,6 +73,95 @@ class _ProfilPageState extends State<ProfilPage> {
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.green[100],
         onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class _ProfilPageContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          // SizedBox(height: 16.0),
+          const SizedBox(
+            width: double.infinity, // Set the container width to fit the screen
+            child: _ProfileCard(
+              profileImage: 'https://placehold.co/400x400.png',
+              userName: 'John Doe',
+            ),
+          ),
+          ListTile(
+            title: const Text('Akun'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.pushNamed(context, '/edit_profil');
+              // Handle 'Akun' button tap
+              // Navigate to Akun page
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Pusat Bantuan'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.pushNamed(context, '/pusatbantuan');
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text(
+              'Keluar',
+              style: TextStyle(color: Colors.red),
+            ),
+            trailing: const Icon(Icons.exit_to_app, color: Colors.red),
+            onTap: () {
+              // Handle 'Keluar' button tap
+              // Perform logout action
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileCard extends StatelessWidget {
+  final String profileImage;
+  final String userName;
+
+  const _ProfileCard({
+    required this.profileImage,
+    required this.userName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Container(
+              width: 120.0,
+              height: 120.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Theme.of(context).primaryColor),
+              ),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(profileImage),
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              userName,
+              style:
+                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
     );
   }

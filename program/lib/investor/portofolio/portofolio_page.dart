@@ -1,36 +1,5 @@
 import 'package:flutter/material.dart';
-import '../marketplace/marketplace_page.dart';
-import '../profil/profil_page.dart';
-import '../beranda/beranda.dart';
 import '../../assets/font.dart';
-import 'detail_portofolio.dart';
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/beranda', // Set the initial route to '/'
-      routes: {
-        '/beranda': (context) => HomePage(),
-        '/marketplace': (context) => MarketplacePage(),
-        '/portofolio': (context) => PortofolioPage(),
-        '/detail-portofolio': (context) => DetailPortofolioPage(),
-        '/profil': (context) => ProfilPage(),
-      },
-    );
-  }
-}
 
 class Portofolio {
   String judul;

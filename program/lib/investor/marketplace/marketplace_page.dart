@@ -1,32 +1,4 @@
 import 'package:flutter/material.dart';
-import '../portofolio/portofolio_page.dart';
-import '../profil/profil_page.dart';
-import '../beranda/beranda.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/marketplace', // Set the initial route to '/marketplace'
-      routes: {
-        '/beranda': (context) => HomePage(),
-        '/marketplace': (context) => MarketplacePage(),
-        '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => ProfilPage(),
-      },
-    );
-  }
-}
 
 class MarketplacePage extends StatelessWidget {
   @override

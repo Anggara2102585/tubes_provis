@@ -1,39 +1,5 @@
 import 'package:flutter/material.dart';
-import 'notification_page.dart';
-import 'topup_page.dart';
-import 'tarikdana_page.dart';
-import '../marketplace/marketplace_page.dart';
-import '../portofolio/portofolio_page.dart';
-import '../profil/profil_page.dart';
 import '../../assets/font.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: HomePage(),
-      initialRoute: '/beranda',
-      routes: {
-        '/notification': (context) => NotificationPage(),
-        '/topup': (context) => TopUpPage(),
-        '/tarikdana': (context) => TarikDanaPage(),
-        '/marketplace': (context) => MarketplacePage(),
-        '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => ProfilPage(),
-      },
-    );
-  }
-}
 
 class HomePage extends StatefulWidget {
   @override
@@ -56,7 +22,7 @@ class _HomePageState extends State<HomePage> {
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
       case 0:
-        // Do nothing or handle home page logic
+        Navigator.pushNamed(context, '/beranda');
         break;
       case 1:
         Navigator.pushNamed(context, '/marketplace');
@@ -113,6 +79,67 @@ class _HomePageState extends State<HomePage> {
                     icon: Icon(Icons.notifications),
                   ),
                 ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Saldo',
+                                  style: bodyBoldTextStyle,
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'Rp 1.000.000',
+                                  style: bodyTextStyle,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/topup');
+                                },
+                                icon: Column(
+                                  children: [
+                                    Icon(Icons.account_balance_wallet_outlined,
+                                        size: 24.0),
+                                  ],
+                                ),
+                                tooltip: 'Top Up',
+                              ),
+                              SizedBox(width: 16.0),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/tarikdana');
+                                },
+                                icon: Column(
+                                  children: [
+                                    Icon(Icons.currency_exchange, size: 24.0),
+                                  ],
+                                ),
+                                tooltip: 'Tarik Dana',
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
             Padding(
@@ -199,9 +226,11 @@ class _HomePageState extends State<HomePage> {
                       Text('Akun UMKM pendanaan aktif'),
                       SizedBox(height: 16.0),
                       Table(
-                        border: TableBorder.all(),
                         children: [
                           TableRow(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                            ),
                             children: [
                               TableCell(
                                 child: Padding(
@@ -218,6 +247,9 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           TableRow(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                            ),
                             children: [
                               TableCell(
                                 child: Padding(
@@ -234,6 +266,9 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           TableRow(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                            ),
                             children: [
                               TableCell(
                                 child: Padding(
@@ -249,14 +284,80 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           ),
-                          // Add more rows as needed
+                          // Tambahkan baris lebih banyak jika diperlukan
                         ],
-                      ),
+                      )
                     ],
                   ),
                 ),
               ),
             ),
+            // Padding(
+            //   padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+            //   child: Card(
+            //     child: Padding(
+            //       padding:
+            //           EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+            //       child: Card(
+            //         child: Column(
+            //           children: <Widget>[
+            //             Container(
+            //               padding: EdgeInsets.all(8.0),
+            //               color: Colors
+            //                   .green[200], // Accent color for the table header
+            //               child: Row(
+            //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //                 children: [
+            //                   Text('Nama UMKM'),
+            //                   Text('Sisa Pokok'),
+            //                 ],
+            //               ),
+            //             ),
+            //             Table(
+            //               defaultVerticalAlignment:
+            //                   TableCellVerticalAlignment.middle,
+            //               children: [
+            //                 TableRow(
+            //                   children: [
+            //                     TableCell(
+            //                       child: Padding(
+            //                         padding: EdgeInsets.all(8.0),
+            //                         child: Text('UMKM 1'),
+            //                       ),
+            //                     ),
+            //                     TableCell(
+            //                       child: Padding(
+            //                         padding: EdgeInsets.all(8.0),
+            //                         child: Text('Rp 500.000'),
+            //                       ),
+            //                     ),
+            //                   ],
+            //                 ),
+            //                 TableRow(
+            //                   children: [
+            //                     TableCell(
+            //                       child: Padding(
+            //                         padding: EdgeInsets.all(8.0),
+            //                         child: Text('UMKM 2'),
+            //                       ),
+            //                     ),
+            //                     TableCell(
+            //                       child: Padding(
+            //                         padding: EdgeInsets.all(8.0),
+            //                         child: Text('Rp 700.000'),
+            //                       ),
+            //                     ),
+            //                   ],
+            //                 ),
+            //                 // Add more rows if needed
+            //               ],
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

@@ -1,35 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:async';
-
-void main() {
-  runApp(MyApp());
-}
 
 enum UserRole {
   Investor,
   Borrower,
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Register',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/',
-      routes: {
-        '/register': (context) => RoleSelectionPage(),
-        '/register/akun': (context) => RegisterPage(),
-      },
-    );
-  }
 }
 
 class RoleSelectionPage extends StatelessWidget {

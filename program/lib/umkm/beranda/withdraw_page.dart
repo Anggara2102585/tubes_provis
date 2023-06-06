@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../assets/font.dart';
 
 class TarikDanaPage extends StatefulWidget {
   @override
@@ -31,9 +30,32 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
     });
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   void _tarikDana() {
-    if (nomorRekeningController.text.isEmpty) {
-      _showErrorDialog('Nomor Rekening belum diisi');
+    String nomorRekening = nomorRekeningController.text.trim();
+    if (nomorRekening.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Peringatan'),
+            content: Text('Mohon lengkapi nomor rekening.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
       return;
     }
 
@@ -49,10 +71,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-            'Sukses',
-          ),
-          backgroundColor: Colors.green,
+          title: Text('Sukses'),
           content: Text('Uang berhasil ditarik.'),
           actions: [
             TextButton(
@@ -62,28 +81,6 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                   nomorRekeningController.text =
                       originalNomorRekeningController.text;
                 });
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Error',
-          ),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
                 Navigator.of(context).pop();
               },
               child: Text('OK'),
@@ -114,10 +111,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Tarik Dana',
-          style: titleTextStyle,
-        ),
+        title: Text('Tarik Dana'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -127,7 +121,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
             SizedBox(height: 16),
             Text(
               'Jumlah',
-              style: bodyBoldTextStyle,
+              style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 8),
             Container(
@@ -141,14 +135,14 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       'Rp',
-                      style: bodyTextStyle,
+                      style: TextStyle(fontSize: 18),
                     ),
                   ),
                   Expanded(
                     child: TextField(
                       controller: jumlahController,
                       keyboardType: TextInputType.number,
-                      style: bodyTextStyle,
+                      style: TextStyle(fontSize: 18),
                       decoration: InputDecoration(
                         hintText: '0',
                         border: InputBorder.none,
@@ -163,12 +157,12 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
             SizedBox(height: 16),
             Text(
               'Saldo Tersedia: $saldo',
-              style: bodyTextStyle,
+              style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16),
             Text(
               'Alamat Pengiriman Dana',
-              style: bodyBoldTextStyle,
+              style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 8),
             Container(
@@ -182,9 +176,9 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Pilih bank yang akan digunakan:',
-                    style: bodyTextStyle,
+                    style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: 8),
                   Wrap(
@@ -192,7 +186,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                       return ListTile(
                         title: Text(
                           val,
-                          style: bodyTextStyle,
+                          style: TextStyle(fontSize: 16),
                         ),
                         leading: Radio<String>(
                           value: val,
@@ -208,13 +202,13 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
             SizedBox(height: 8),
             Text(
               'No. Rekening',
-              style: bodyBoldTextStyle,
+              style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 8),
             TextField(
               controller: nomorRekeningController,
               keyboardType: TextInputType.number,
-              style: bodyBoldTextStyle,
+              style: TextStyle(fontSize: 18),
               decoration: InputDecoration(
                 hintText: 'Masukkan nomor rekening',
                 border: OutlineInputBorder(
@@ -238,7 +232,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                 ),
                 child: Text(
                   'Tarik',
-                  style: bodyBoldTextStyle,
+                  style: TextStyle(fontSize: 18),
                 ),
               ),
             ),
@@ -252,12 +246,8 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
             label: 'Beranda',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Marketplace',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart),
-            label: 'Portofolio',
+            icon: Icon(Icons.business),
+            label: 'Usahaku',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -269,48 +259,6 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
         unselectedItemColor: Colors.green[100],
         onTap: _onItemTapped,
       ),
-    );
-  }
-
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) {
-      // Kembali ke halaman sebelumnya
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-
-    // Navigate to the corresponding page based on the selected index
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.pushNamed(context, '/beranda');
-        break;
-      case 1:
-        Navigator.pushNamed(context, '/marketplace');
-        break;
-      case 2:
-        Navigator.pushNamed(context, '/portofolio');
-        break;
-      case 3:
-        Navigator.pushNamed(context, '/profil');
-        break;
-    }
-  }
-}
-
-class TarikDanaPageWrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: TarikDanaPage(),
     );
   }
 }

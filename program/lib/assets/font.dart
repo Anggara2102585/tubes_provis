@@ -22,11 +22,19 @@ TextStyle bodyBoldTextStyle = GoogleFonts.robotoSlab(
   fontSize: 16.0,
   fontWeight: FontWeight.bold,
 );
+TextStyle body2TextStyle = GoogleFonts.robotoSlab(
+  fontSize: 14.0,
+  fontWeight: FontWeight.normal,
+);
+TextStyle body2BoldTextStyle = GoogleFonts.robotoSlab(
+  fontSize: 14.0,
+  fontWeight: FontWeight.bold,
+);
 TextStyle buttonTextStyle = GoogleFonts.robotoSlab(
   fontSize: 14.0,
   fontWeight: FontWeight.normal,
 );
 TextStyle captionTextStyle = GoogleFonts.robotoSlab(
-  fontSize: 14.0,
+  fontSize: 12.0,
   fontWeight: FontWeight.normal,
 );
