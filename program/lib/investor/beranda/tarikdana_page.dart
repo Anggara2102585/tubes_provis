@@ -4,7 +4,7 @@ import 'topup_page.dart';
 import '../marketplace/marketplace_page.dart';
 import '../portofolio/portofolio_page.dart';
 import '../profil/profil_page.dart';
-import '../assets/font.dart';
+import '../../assets/font.dart';
 
 class TarikDanaPage extends StatefulWidget {
   @override
@@ -315,14 +315,6 @@ class TarikDanaPageWrapper extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: TarikDanaPage(),
-      routes: {
-        '/notification': (context) => NotificationPage(),
-        '/topup': (context) => TopUpPage(),
-        '/withdraw': (context) => TarikDanaPage(),
-        '/marketplace': (context) => MarketplacePage(),
-        '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => ProfilPage(),
-      },
     );
   }
 }

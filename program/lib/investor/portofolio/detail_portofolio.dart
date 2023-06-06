@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'portofolio_page.dart';
+import '../../assets/font.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +12,8 @@ class DetailPortofolioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final Portofolio portofolio =
+    //     ModalRoute.of(context)!.settings.arguments as Portofolio;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Pendanaan',
@@ -17,13 +21,16 @@ class DetailPortofolioPage extends StatelessWidget {
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/detail',
+      initialRoute: '/portofolio',
       routes: {
-        // '/portofolio': (context) => const PortofolioPage(),
+        '/portofolio': (context) => PortofolioPage(),
       },
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Pendanaan'),
+          title: Text(
+            'Pendanaan',
+            style: titleTextStyle,
+          ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back), // Tambahkan ikon panah kembali
             onPressed: () {
@@ -67,26 +74,23 @@ class DetailPortofolioPage extends StatelessWidget {
                           const SizedBox(width: 16),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 'Nama Pemilik UMKM',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: body2BoldTextStyle,
                               ),
                               SizedBox(height: 8),
                               Text(
                                 'UMKM Name',
-                                style: TextStyle(fontSize: 14),
+                                style: body2TextStyle,
                               ),
                               Text(
                                 'Jenis Usaha',
-                                style: TextStyle(fontSize: 14),
+                                style: body2TextStyle,
                               ),
                               Text(
                                 '082xxxxxxxx',
-                                style: TextStyle(fontSize: 14),
+                                style: body2TextStyle,
                               ),
                             ],
                           ),
@@ -95,14 +99,11 @@ class DetailPortofolioPage extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         'UMKM Details:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: body2BoldTextStyle,
                       ),
                       Text(
                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur in pulvinar magna, at posuere felis. Nunc non finibus ante, vel blandit mauris.',
-                        style: TextStyle(fontSize: 14),
+                        style: body2TextStyle,
                       ),
                     ],
                   ),
@@ -126,16 +127,13 @@ class DetailPortofolioPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Detail Pendanaan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: body2BoldTextStyle,
                       ),
                       Text(
                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur in pulvinar magna, at posuere felis. Nunc non finibus ante, vel blandit mauris.',
-                        style: TextStyle(fontSize: 14),
+                        style: body2TextStyle,
                       ),
                     ],
                   ),
@@ -195,17 +193,14 @@ class DetailPortofolioPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Ulasan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: body2BoldTextStyle,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur in pulvinar magna, at posuere felis. Nunc non finibus ante, vel blandit mauris.',
-                        style: TextStyle(fontSize: 14),
+                        style: body2TextStyle,
                       ),
                     ],
                   ),
@@ -256,17 +251,11 @@ class ProgressBar extends StatelessWidget {
             children: [
               Text(
                 progressNumber,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: captionTextStyle,
               ),
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: captionTextStyle,
               ),
             ],
           ),

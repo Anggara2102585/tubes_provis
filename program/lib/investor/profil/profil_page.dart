@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import '../marketplace/marketplace_page.dart';
 import '../portofolio/portofolio_page.dart';
-import '../profil/profil_page.dart';
-import '../beranda/main.dart';
-import '../assets/font.dart';
+import '../beranda/beranda.dart';
+import '../../assets/font.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
-class MarketplacePage extends StatefulWidget {
+class ProfilPage extends StatefulWidget {
   @override
-  _MarketplacePageState createState() => _MarketplacePageState();
+  _ProfilPageState createState() => _ProfilPageState();
 }
 
 class MyApp extends StatelessWidget {
@@ -24,24 +24,24 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/', // Set the initial route to '/beranda'
+      initialRoute: '/beranda', // Set the initial route to '/beranda'
       routes: {
-        '/': (context) => HomePage(),
+        '/beranda': (context) => HomePage(),
         '/marketplace': (context) => MarketplacePage(),
         '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => ProfilPage(),
+        // '/profil': (context) => ProfilPage(),
       },
     );
   }
 }
 
-class MarketplaceStatePage extends StatefulWidget {
+class ProfilStatePage extends StatefulWidget {
   @override
-  _MarketplacePageState createState() => _MarketplacePageState();
+  _ProfilPageState createState() => _ProfilPageState();
 }
 
-class _MarketplacePageState extends State<MarketplacePage> {
-  int _selectedIndex = 1; // Set default selected index to 1 (Marketplace)
+class _ProfilPageState extends State<ProfilPage> {
+  int _selectedIndex = 3; // Set default selected index to 1 (Profil)
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -57,16 +57,15 @@ class _MarketplacePageState extends State<MarketplacePage> {
     switch (_selectedIndex) {
       case 0:
         Navigator.pushReplacementNamed(context,
-            '/'); // Use pushReplacementNamed to replace the current page
+            '/beranda'); // Use pushReplacementNamed to replace the current page
         break;
       case 1:
-        // Do nothing or handle marketplace page logic
+        Navigator.pushReplacementNamed(context, '/marketplace');
         break;
       case 2:
         Navigator.pushReplacementNamed(context, '/portofolio');
         break;
       case 3:
-        Navigator.pushReplacementNamed(context, '/profil');
         break;
     }
   }
@@ -76,13 +75,13 @@ class _MarketplacePageState extends State<MarketplacePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Marketplace',
+          'Profil',
           style: titleTextStyle,
         ),
       ),
       body: Center(
         child: Text(
-          'Marketplace',
+          'Profil',
           style: titleTextStyle,
         ),
       ),

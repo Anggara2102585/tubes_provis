@@ -4,7 +4,7 @@ import 'tarikdana_page.dart';
 import '../marketplace/marketplace_page.dart';
 import '../portofolio/portofolio_page.dart';
 import '../profil/profil_page.dart';
-import '../assets/font.dart';
+import '../../assets/font.dart';
 
 enum MetodeTopUp { transferBank, eWallet }
 
@@ -20,14 +20,15 @@ class TopUpPage extends StatefulWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: TopUpPage(),
-      routes: {
-        '/notification': (context) => NotificationPage(),
-        '/topup': (context) => TopUpPage(),
-        '/withdraw': (context) => TarikDanaPage(),
-        '/marketplace': (context) => MarketplacePage(),
-        '/portofolio': (context) => PortofolioPage(),
-        '/profil': (context) => ProfilPage(),
-      },
+      initialRoute: '/topup',
+      // routes: {
+      //   '/notification': (context) => NotificationPage(),
+      //   '/topup': (context) => TopUpPage(),
+      //   '/withdraw': (context) => TarikDanaPage(),
+      //   '/marketplace': (context) => MarketplacePage(),
+      //   '/portofolio': (context) => PortofolioPage(),
+      //   '/profil': (context) => ProfilPage(),
+      // },
     );
   }
 }

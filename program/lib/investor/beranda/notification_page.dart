@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../assets/font.dart';
+import '../../assets/font.dart';
 
 class NotificationPage extends StatelessWidget {
   final List<NotificationItem> notifications = [

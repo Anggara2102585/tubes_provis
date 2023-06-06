@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../marketplace/marketplace_page.dart';
 import '../profil/profil_page.dart';
-import '../beranda/main.dart';
-import '../assets/font.dart';
+import '../beranda/beranda.dart';
+import '../../assets/font.dart';
 import 'detail_portofolio.dart';
 
 void main() {
@@ -20,12 +20,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/', // Set the initial route to '/'
+      initialRoute: '/beranda', // Set the initial route to '/'
       routes: {
-        '/': (context) => HomePage(),
+        '/beranda': (context) => HomePage(),
         '/marketplace': (context) => MarketplacePage(),
         '/portofolio': (context) => PortofolioPage(),
-        // '/detail-portofolio': (context) => DetailPortofolioPage(),
+        '/detail-portofolio': (context) => DetailPortofolioPage(),
         '/profil': (context) => ProfilPage(),
       },
     );
@@ -68,7 +68,7 @@ class _PortofolioPageState extends State<PortofolioPage> {
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
       case 0:
-        Navigator.pushReplacementNamed(context, '/');
+        Navigator.pushReplacementNamed(context, '/beranda');
         break;
       case 1:
         Navigator.pushReplacementNamed(context, '/marketplace');
@@ -102,20 +102,23 @@ class _PortofolioPageState extends State<PortofolioPage> {
     ),
   ];
 
-  void _navigateToPortofolioPage(BuildContext context, Portofolio portofolio) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DetailPortofolioPage(),
-      ),
-    );
-  }
+  // void _navigateToPortofolioPage(BuildContext context, Portofolio portofolio) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => DetailPortofolioPage(),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Portofolio'),
+        title: Text(
+          'Portofolio',
+          style: titleTextStyle,
+        ),
       ),
       body: ListView.builder(
         itemCount: listPortofolio.length,
@@ -123,12 +126,21 @@ class _PortofolioPageState extends State<PortofolioPage> {
           Portofolio portofolio = listPortofolio[index];
           return Card(
             child: ListTile(
-              title: Text(portofolio.judul),
+              title: Text(
+                portofolio.judul,
+                style: bodyBoldTextStyle,
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(portofolio.tanggalAkhir),
-                  Text(portofolio.deskripsi),
+                  Text(
+                    portofolio.tanggalAkhir,
+                    style: bodyTextStyle,
+                  ),
+                  Text(
+                    portofolio.deskripsi,
+                    style: bodyTextStyle,
+                  ),
                 ],
               ),
               trailing: Text(
@@ -139,7 +151,7 @@ class _PortofolioPageState extends State<PortofolioPage> {
                 ),
               ),
               onTap: () {
-                _navigateToPortofolioPage(context, portofolio);
+                Navigator.pushNamed(context, '/tarikdana');
               },
             ),
           );
