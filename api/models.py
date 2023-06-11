@@ -107,7 +107,7 @@ class Pendana(Base):
     email = Column(String)
 
     dompet = relationship("Dompet", back_populates="pendana", cascade="all")
-    akun = relationship("Akun", back_populates="umkm", cascade="all")
+    akun = relationship("Akun", back_populates="pendana", cascade="all")
     pendanaan = relationship("Pendanaan", secondary="pendanaan_pendana", back_populates="pendana")
     pendana_notifikasi = relationship("PendanaNotifikasi", back_populates="pendana", cascade="all")
 

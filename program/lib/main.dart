@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:myapp/authentication/login.dart';
-import 'package:myapp/authentication/register.dart';
+import 'package:myapp/authentication/register copy.dart';
 import 'package:myapp/investor/beranda/beranda.dart';
 import 'package:myapp/investor/beranda/notification_page.dart';
 import 'package:myapp/investor/beranda/tarikdana_page.dart';
