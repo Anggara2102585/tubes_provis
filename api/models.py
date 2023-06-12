@@ -20,8 +20,9 @@ class Akun(Base):
     id_akun = Column(Integer, primary_key=True, index=True, autoincrement=True)
     username = Column(String, unique=True)
     password = Column(String)
-    foto_ktp = Column(String, unique=True)
-    foto_selfie = Column(String, unique=True)
+    foto_ktp = Column(String)
+    foto_selfie = Column(String)
+    jenis_user = Column(Integer)
 
     umkm = relationship("Umkm", uselist=False, back_populates="akun")
     pendana = relationship("Pendana", uselist=False, back_populates="akun")
@@ -30,7 +31,7 @@ class Umkm(Base):
     __tablename__ = "umkm"
 
     id_umkm = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    foto_profil = Column(String, unique=True)
+    foto_profil = Column(String)
     nama_umkm = Column(String)
     jenis_usaha = Column(String)
     rating = Column(Float)
@@ -42,6 +43,7 @@ class Umkm(Base):
     id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
     id_akun = Column(Integer, ForeignKey("akun.id_akun"))
     email = Column(String)
+    nama_pemilik = Column(String)
 
     dompet = relationship("Dompet", back_populates="umkm", cascade="all")
     akun = relationship("Akun", back_populates="umkm", cascade="all")

@@ -120,7 +120,7 @@ class _PortofolioPageState extends State<PortofolioPage> {
                 ),
               ),
               onTap: () {
-                Navigator.pushNamed(context, '/tarikdana');
+                Navigator.pushNamed(context, '/detail-portofolio');
               },
             ),
           );
