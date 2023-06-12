@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:html' as html;
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_crop/image_crop.dart' as crop;
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -24,58 +27,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  Future<void> _selectProfilePicture() async {
-    final html.FileUploadInputElement input = html.FileUploadInputElement();
-    input.accept = 'image/*';
-    input.click();
+  File? _image;
 
-    input.onChange.listen((event) {
-      final files = input.files;
-      if (files != null && files.isNotEmpty) {
-        final file = files[0];
-        final reader = html.FileReader();
+  Future<void> _getImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
 
-        reader.onLoad.listen((e) {
-          final imageBytes = reader.result as Uint8List;
-          setState(() {
-            _selectedImage = imageBytes;
-          });
-        });
+    if (pickedImage != null) {
+      // final imageFile = File(pickedImage.path);
+      // final appDir = await getApplicationDocumentsDirectory();
+      // final fileName = '${DateTime.now().millisecondsSinceEpoch}.png';
+      // final savedImage = await imageFile.copy('${appDir.path}/$fileName');
 
-        reader.readAsArrayBuffer(file);
-      }
-    });
+      setState(() {
+        // _image = savedImage;
+        _image = File(pickedImage.path);
+        // _image
+      });
+    }
   }
-
-  // Future<Uint8List?> _cropImage(Uint8List? imageData) async {
-  //   if (imageData == null) return null;
-
-  //   final cropKey = GlobalKey<crop.ImageCropState>();
-  //   final aspectRatio = CropAspectRatio(aspectRatioX: 1, aspectRatioY: 1);
-  //   final croppedImage = await showDialog<Uint8List>(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: const Text('Crop Image'),
-  //         content: crop.ImageCrop(
-  //           key: cropKey,
-  //           image: imageData,
-  //           aspectRatio: aspectRatio,
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop(cropKey.currentState?.crop());
-  //             },
-  //             child: const Text('Crop'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-
-  //   return croppedImage;
-  // }
 
   @override
   void initState() {
@@ -135,6 +105,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   addressController.text = '123 Street, City';
                   usernameController.text = 'user123';
                   passwordController.text = '********';
+                  _image = null;
                 });
               },
             ),
@@ -144,22 +115,51 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: _selectProfilePicture,
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Theme.of(context).primaryColor),
-                ),
-                // child: CircleAvatar(
-                //   radius: 80,
-                //   backgroundImage: _selectedImage != null
-                //       ? MemoryImage(_selectedImage!)
-                //       : const NetworkImage('https://placehold.co/400x400.png'),
-                // ),
+            const SizedBox(height: 16),
+            Container(
+              width: 120.0,
+              height: 120.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Theme.of(context).primaryColor),
+              ),
+              child: CircleAvatar(
+                radius: 50,
+                child: _image == null
+                    ? Icon(Icons.person)
+                    : ClipOval(
+                        child: Image.network(
+                          _image!.path,
+                          width: 150,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
               ),
             ),
+            const SizedBox(height: 20),
+            isEditMode
+                ? ElevatedButton(
+                    onPressed: _getImageFromGallery,
+                    child: const Text('Select Image'),
+                  )
+                : const SizedBox(height: 0),
+            // const SizedBox(height: 20),
+            // GestureDetector(
+            //   onTap: () {},
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       shape: BoxShape.circle,
+            //       border: Border.all(color: Theme.of(context).primaryColor),
+            //     ),
+            //     // child: CircleAvatar(
+            //     //   radius: 80,
+            //     //   backgroundImage: _selectedImage != null
+            //     //       ? MemoryImage(_selectedImage!)
+            //     //       : const NetworkImage('https://placehold.co/400x400.png'),
+            //     // ),
+            //   ),
+            // ),
             const SizedBox(height: 10),
             isEditMode
                 ? Padding(
