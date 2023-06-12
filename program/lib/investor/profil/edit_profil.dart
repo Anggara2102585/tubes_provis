@@ -7,6 +7,7 @@ import 'package:image_crop/image_crop.dart' as crop;
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:myapp/models/profil.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -19,7 +20,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool isEditMode = false;
   Uint8List? _selectedImage;
   final ImagePickerWeb _imagePicker = ImagePickerWeb();
-
+  final models = ActivityCubit();
+  // var futureProfil = ActivityCubit.fetchData();
+  late ActivityProfil futureProfil;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -50,6 +53,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
+    futureProfil = models.fetchData() as ActivityProfil;
     // Initialize the text field values with previous data
     nameController.text = 'User Name';
     emailController.text = 'user@example.com';

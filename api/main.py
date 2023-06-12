@@ -1,6 +1,8 @@
 from decimal import Decimal
 from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
 
 import schemas, models
 from database import SessionLocal, engine
@@ -8,6 +10,15 @@ from database import SessionLocal, engine
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Update this list with appropriate origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Dependency
 def get_db():
@@ -127,3 +138,60 @@ def login(login_request: schemas.Login, db: Session = Depends(get_db)):
 """ 
 Pendana
 """
+
+@app.post("/pendana/beranda")
+def get_pendana_homepage(pendana_request: schemas.BerandaPendana, db: Session = Depends(get_db)):
+    # Retrieve the Pendana data
+    pendana = db.query(models.Pendana).filter(models.Pendana.id_akun == pendana_request.id_akun).first()
+    if not pendana:
+        raise HTTPException(status_code=404, detail="Pendana not found")
+
+    # Retrieve the saldo from the Dompet table
+    saldo = db.query(models.Dompet.saldo).filter(models.Dompet.id_dompet == pendana.id_dompet).scalar()
+
+    # Calculate total_pendanaan
+    total_pendanaan = db.query(func.sum(models.PendanaanPendana.jumlah_danai)).\
+        join(models.Pendanaan).\
+        filter(models.PendanaanPendana.id_pendana == pendana.id_pendana).\
+        filter(models.Pendanaan.status_pendanaan != 5).\
+        scalar()
+    if total_pendanaan is None:
+        total_pendanaan = 0
+
+    # Calculate total_bagi_hasil
+    total_bagi_hasil = db.query(func.sum(models.RiwayatTransaksi.nominal)).\
+        filter(models.Dompet.id_dompet == pendana.id_dompet).\
+        filter(models.RiwayatTransaksi.jenis_transaksi == 2).\
+        scalar()
+    if total_bagi_hasil is None:
+        total_bagi_hasil = 0
+
+    # Calculate jumlah_didanai_aktif
+    jumlah_didanai_aktif = db.query(func.sum(models.PendanaanPendana.jumlah_danai)).\
+        join(models.Pendanaan).\
+        filter(models.PendanaanPendana.id_pendana == pendana.id_pendana).\
+        filter(models.Pendanaan.status_pendanaan.in_([1, 2, 3])).\
+        scalar()
+    if jumlah_didanai_aktif is None:
+        jumlah_didanai_aktif = 0
+
+    # Retrieve the UMKM data
+    umkm_records = db.query(models.Umkm.nama_umkm, (models.PendanaanPendana.jumlah_danai + models.PendanaanPendana.jumlah_danai * models.PendanaanPendana.imba_hasil).label('sisa_pokok')).\
+        join(models.PendanaanPendana).\
+        filter(models.PendanaanPendana.id_pendana == pendana.id_pendana).\
+        all()
+
+    # Prepare the UMKM data
+    umkm_data = [schemas.UMKMData(nama_umkm=umkm.nama_umkm, sisa_pokok=umkm.sisa_pokok) for umkm in umkm_records]
+
+    # Construct the response
+    response = schemas.PendanaHomePage(
+        nama_pendana=pendana.nama_pendana,
+        saldo=saldo,
+        total_pendanaan=total_pendanaan,
+        total_bagi_hasil=total_bagi_hasil,
+        jumlah_didanai_aktif=jumlah_didanai_aktif,
+        umkm=umkm_data
+    )
+
+    return response

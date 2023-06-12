@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:myapp/authentication/login.dart';
+import 'package:myapp/authentication/login copy.dart';
 import 'package:myapp/authentication/register copy.dart';
 import 'package:myapp/investor/beranda/beranda.dart';
 import 'package:myapp/investor/beranda/notification_page.dart';

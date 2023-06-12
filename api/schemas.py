@@ -50,7 +50,7 @@ class ResponseBerandaPendana(BaseModel):
     total_pendanaan: Decimal # total jumlah_danai - (total pendanaan gagal yang dia danai)
     total_bagi_hasil: Decimal # total riwayat_transaksi jenis 2
     jumlah_didanai_aktif: int
-    umkm: List[ListUMKMBerandaPendana] = []
+    umkm: List[ListUMKMBerandaPendana]
 
 # Notifikasi
 class ListNotifikasi(BaseModel):
@@ -68,11 +68,15 @@ notif:
 class TopUp(BaseModel):
     nominal: Decimal
     id_akun: int
+    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
 
 # Tarik Dana
-""" return """
+""" return:
+saldo
+"""
 class GetSaldo(BaseModel):
     id_akun: int
+    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
 """
 (ngurangin saldo + notifikasi)
 - judul: Tarik Dana Berhasil / Gagal
@@ -81,6 +85,7 @@ class GetSaldo(BaseModel):
 class TarikDana(BaseModel):
     nominal: Decimal
     id_akun: int
+    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
 
 # Marketplace
 

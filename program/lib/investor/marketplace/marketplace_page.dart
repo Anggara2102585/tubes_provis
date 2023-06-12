@@ -1,6 +1,28 @@
 import 'package:flutter/material.dart';
 
-class MarketplacePage extends StatelessWidget {
+class MarketplacePage extends StatefulWidget {
+  @override
+  _MarketplacePageState createState() => _MarketplacePageState();
+}
+
+class _MarketplacePageState extends State<MarketplacePage> {
+  String searchQuery = '';
+
+  void setSearchQuery(String query) {
+    setState(() {
+      searchQuery = query;
+    });
+  }
+
+  String formatCurrency(double amount) {
+    String formattedValue = 'Rp ' +
+        amount.toStringAsFixed(0).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match match) => '${match[1]}.',
+        );
+    return formattedValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,6 +34,31 @@ class MarketplacePage extends StatelessWidget {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: setSearchQuery,
+                        decoration: InputDecoration(
+                          labelText: 'Cari Pendanaan',
+                          suffixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Perform search logic here
+                        // You can use the `searchQuery` variable to access the user's input
+                      },
+                      child: Text('Cari'),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.0),
               UMKMCard(
                 name: 'UMKM ABC',
                 progress: 70,

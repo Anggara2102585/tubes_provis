@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/assets/font.dart';
+import 'package:myapp/models/profil.dart';
 
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
@@ -10,7 +11,7 @@ class ProfilPage extends StatefulWidget {
 
 class ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
-
+  var f = ActivityCubit();
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
       // Kembali ke halaman sebelumnya
@@ -46,7 +47,8 @@ class ProfilPageState extends State<ProfilPage> {
           style: titleTextStyle,
         ),
       ),
-      body: Padding(
+      body: 
+      Padding(
         padding: const EdgeInsets.all(16.0),
         child: _ProfilPageContent(),
       ),
@@ -75,6 +77,11 @@ class ProfilPageState extends State<ProfilPage> {
         onTap: _onItemTapped,
       ),
     );
+  }
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<void>('futureProfil', futureProfil));
   }
 }
 
