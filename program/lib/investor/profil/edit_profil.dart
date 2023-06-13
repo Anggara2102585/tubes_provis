@@ -19,8 +19,8 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   bool isEditMode = false;
   Uint8List? _selectedImage;
-  final ImagePickerWeb _imagePicker = ImagePickerWeb();
-  final models = ActivityCubit();
+  // final ImagePickerWeb _imagePicker = ImagePickerWeb();
+  // final models = ActivityCubit();
   // var futureProfil = ActivityCubit.fetchData();
   late ActivityProfil futureProfil;
   TextEditingController nameController = TextEditingController();
@@ -45,15 +45,60 @@ class _EditProfilePageState extends State<EditProfilePage> {
       setState(() {
         // _image = savedImage;
         _image = File(pickedImage.path);
+        // _saveImage();
         // _image
       });
+    }
+  }
+
+  Future<void> _saveImage() async {
+    if (_image != null) {
+      try {
+        // Get the application documents directory
+
+        final directory = await getApplicationDocumentsDirectory();
+
+        // Generate a unique filename for the image
+        final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+        // final fileName = _image!.path;
+        final fileName = 'image_$timestamp.jpg';
+
+        // Check if the directory exists, create it if necessary
+        if (!(await directory.exists())) {
+          await directory.create(recursive: true);
+        }
+        // Create the destination file path
+        final destinationPath = '${directory.path}/$fileName';
+
+        // Copy the image file to the destination path
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(destinationPath)),
+        );
+        await _image!.copy(destinationPath);
+
+        // Show a success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Image saved successfully!')),
+        );
+      } catch (e) {
+        // Show an error message if the image saving fails
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save image!')),
+        );
+        print(e);
+      }
+    } else {
+      // Show a message if no image is selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No image selected!')),
+      );
     }
   }
 
   @override
   void initState() {
     super.initState();
-    futureProfil = models.fetchData() as ActivityProfil;
+    // futureProfil = models.fetchData() as ActivityProfil;
     // Initialize the text field values with previous data
     nameController.text = 'User Name';
     emailController.text = 'user@example.com';
@@ -148,6 +193,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: const Text('Select Image'),
                   )
                 : const SizedBox(height: 0),
+            ElevatedButton(onPressed: _saveImage, child: const Text('Save')),
             // const SizedBox(height: 20),
             // GestureDetector(
             //   onTap: () {},

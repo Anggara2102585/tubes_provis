@@ -47,8 +47,7 @@ class ProfilPageState extends State<ProfilPage> {
           style: titleTextStyle,
         ),
       ),
-      body: 
-      Padding(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _ProfilPageContent(),
       ),
@@ -78,11 +77,11 @@ class ProfilPageState extends State<ProfilPage> {
       ),
     );
   }
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<void>('futureProfil', futureProfil));
-  }
+  // @override
+  // void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  //   super.debugFillProperties(properties);
+  //   properties.add(DiagnosticsProperty<void>('futureProfil', futureProfil));
+  // }
 }
 
 class _ProfilPageContent extends StatelessWidget {
