@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 """ AUTHHENTICATION """
 
+# return: message [berhasil|gagal]
 class BaseRegister(BaseModel):
     nama: str
     username: str
@@ -40,11 +41,9 @@ class ResponseLoginSuccess(BaseModel):
 class ListUMKMBerandaPendana(BaseModel):
     nama_umkm: str
     sisa_pokok: Decimal # total_danai + total_danai*imba_hasil
-
-class BerandaPendana(BaseModel):
+class BerandaPendana(BaseModel): # Request
     id_akun: int
-
-class ResponseBerandaPendana(BaseModel):
+class ResponseBerandaPendana(BaseModel): # Response
     nama_pendana: str
     saldo: Decimal
     total_pendanaan: Decimal # total jumlah_danai - (total pendanaan gagal yang dia danai)
@@ -53,19 +52,25 @@ class ResponseBerandaPendana(BaseModel):
     umkm: List[ListUMKMBerandaPendana]
 
 # Notifikasi
-class ListNotifikasi(BaseModel):
+class ListNotifikasi(BaseModel): # Request
+    id_akun: int
+    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
+class Notifikasi(BaseModel):
     judul_notifikasi: str
     is_terbaca: bool
     waktu_tanggal: datetime
     isi_notifikasi: str
+class ResponseListNotifikasi(BaseModel): # Response
+    notifikasi: List[Notifikasi]
 
 # Top Up (nambah saldo + notifikasi)
 """
+return: message (pasti berhasil)
 notif:
-- judul: Top Up berhasil atau gagal ...
+- judul: Top Up berhasil atau gagal ... (pasti berhasil)
 - isi_notifikasi: nunggu Khana
 """
-class TopUp(BaseModel):
+class TopUp(BaseModel): # Request
     nominal: Decimal
     id_akun: int
     jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
@@ -79,7 +84,9 @@ class GetSaldo(BaseModel):
     jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
 """
 (ngurangin saldo + notifikasi)
-- judul: Tarik Dana Berhasil / Gagal
+return: message [gagal/berhasil]
+notif:
+- judul: Tarik Dana Berhasil / Gagal (bisa gagal kalau saldo tidak mencukupi)
 - isi_notifikasi: "Dana sebesar Rp.$nominal berhasil ditarik dari dompet!"
 """
 class TarikDana(BaseModel):
@@ -104,11 +111,12 @@ tiap UMKM:
 - imba_hasil
 - dl_penggalangan_dana
 """
-class ListMarketplace(BaseModel):
-    nama_umkm: Optional[str]
+class ListMarketplace(BaseModel): # Request
+    nama_umkm: Optional[str] # kalau isi berarti pake filter
     # jenis_umkm: Optional[str]
 
 # Portofolio
+
 # List Portofolio
 """ 
 Tiap card:
@@ -119,8 +127,10 @@ Tiap card:
 - status (belum selsai = status (1,2,3))
 """
 class ListPortofolio(BaseModel):
-    id_pendana: int
-# Detail Portofolio
+    # id_pendana: int
+    id_akun: int
+    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
+# Detail Portofolio / Detail Pendanaan
 """ 
 return:
 - nama_pemilik
@@ -153,7 +163,9 @@ return:
 """
 class DetailPendanaan(BaseModel):
     id_pendanaan: int
-    id_pendana: int # yang ngeklik siapa
+    # id_pendana: int # yang ngeklik siapa
+    id_akun: int
+    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
 # Profil
 """
 return:

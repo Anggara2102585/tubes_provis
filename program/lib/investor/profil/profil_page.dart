@@ -78,11 +78,11 @@ class ProfilPageState extends State<ProfilPage> {
       ),
     );
   }
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<void>('futureProfil', futureProfil));
-  }
+  // @override
+  // void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  //   super.debugFillProperties(properties);
+  //   properties.add(DiagnosticsProperty<void>('futureProfil', futureProfil));
+  // }
 }
 
 class _ProfilPageContent extends StatelessWidget {
