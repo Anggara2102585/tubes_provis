@@ -55,6 +55,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
     }
   }
 
+  int adaBelumLunas = 1;
   double _persentasePendanaan = 60.0; // Persentase pendanaan (contoh)
 
   @override
@@ -106,140 +107,232 @@ class _UsahakuPageState extends State<UsahakuPage> {
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Row(
+            SizedBox(height: 16.0),
+            if (adaBelumLunas == 0 || adaBelumLunas == 2)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Pendanaan Belum Lunas',
+                  style: TextStyle(fontSize: 20.0),
+                ),
+              )
+            else if (adaBelumLunas == 1)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Pendanaan Aktif',
+                  style: TextStyle(fontSize: 20.0),
+                ),
+              ),
+            SizedBox(height: 8.0),
+            // belum ada pendanaan
+            if (adaBelumLunas == 0)
+              Column(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Cari Pendanaan',
-                        suffixIcon: Icon(Icons.search),
+                  SizedBox(height: 16.0),
+                  Center(
+                    child: Text(
+                      'Anda belum memiliki pendanaan aktif. Buat baru!',
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/add_pengajuan');
+                      },
+                      child: Icon(Icons.add),
+                      style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(),
+                        padding: EdgeInsets.all(16.0),
                       ),
                     ),
                   ),
-                  SizedBox(width: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Lakukan logika pencarian di sini
-                    },
-                    child: Text('Cari'),
-                  ),
                 ],
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Pendanaan Belum Lunas',
-                style: TextStyle(fontSize: 20.0),
-              ),
-            ),
-            SizedBox(height: 8.0),
-            Container(
-              width: double.infinity,
-              height: 200.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 1, // Ganti dengan jumlah kartu yang sebenarnya
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/pendanaan_belum_lunas');
-                      },
-                      child: Container(
-                        width: 390.0,
-                        child: Card(
-                          child: Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      'Tanggal Pengajuan',
-                                      style: TextStyle(fontSize: 12.0),
-                                    ),
-                                    Text(
-                                      'DD/MM/YYYY', // Ganti dengan tanggal yang sebenarnya
-                                      style: TextStyle(fontSize: 12.0),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8.0),
-                                Text(
-                                  'Judul Pendanaan',
-                                  style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 8.0),
-                                Text(
-                                  'Deskripsi Singkat',
-                                  style: TextStyle(fontSize: 14.0),
-                                ),
-                                Expanded(
-                                  child: Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        // Aksi ketika tombol "Bayar" ditekan
-                                      },
-                                      child: Text('Bayar: Rp '),
+              )
+            // sudah ada pendanaan tpi masih ongoing
+            else if (adaBelumLunas == 1)
+              Container(
+                width: double.infinity,
+                height: 200.0,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 1, // Ganti dengan jumlah kartu yang sebenarnya
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, '/pendanaan_belum_lunas');
+                        },
+                        child: Container(
+                          width: 390.0,
+                          child: Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        'Batas Pendanaan',
+                                        style: TextStyle(fontSize: 12.0),
+                                      ),
+                                      Text(
+                                        'DD/MM/YYYY', // Ganti dengan tanggal yang sebenarnya
+                                        style: TextStyle(fontSize: 12.0),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Text(
+                                    'Judul Pendanaan',
+                                    style: TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Text(
+                                    'Deskripsi Singkat',
+                                    style: TextStyle(fontSize: 14.0),
+                                  ),
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          // Aksi ketika tombol "Bayar" ditekan
+                                        },
+                                        child: Text('Bayar: Rp '),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
+                    );
+                  },
+                ),
+              )
+            // waktunya bagi hasil
+            else if (adaBelumLunas == 2)
+              Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 200.0,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 1, // Ganti dengan jumlah kartu yang sebenarnya
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, '/pendanaan_belum_lunas');
+                            },
+                            child: Container(
+                              width: 390.0,
+                              child: Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Text(
+                                            'Batas Bagi Hasil',
+                                            style: TextStyle(fontSize: 12.0),
+                                          ),
+                                          Text(
+                                            'DD/MM/YYYY', // Ganti dengan tanggal yang sebenarnya
+                                            style: TextStyle(fontSize: 12.0),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 8.0),
+                                      Text(
+                                        'Judul Pendanaan',
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(height: 8.0),
+                                      Text(
+                                        'Deskripsi Singkat',
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Expanded(
+                                        child: Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              // Aksi ketika tombol "Bayar" ditekan
+                                            },
+                                            child: Text('Bayar: Rp '),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 14.0),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Status Pendanaan',
-                    style:
-                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 20.0),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        height: 80.0,
-                        width: 80.0,
-                        child: CircularProgressIndicator(
-                          value: _persentasePendanaan / 100,
-                          backgroundColor: Colors.grey,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              Color.fromARGB(255, 92, 129, 95)),
-                          strokeWidth: 10.0,
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Status Pendanaan',
+                          style: TextStyle(
+                              fontSize: 16.0, fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      Text(
-                        '${_persentasePendanaan.toStringAsFixed(1)}%',
-                        style: TextStyle(
-                            fontSize: 16.0, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                        SizedBox(height: 20.0),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              height: 80.0,
+                              width: 80.0,
+                              child: CircularProgressIndicator(
+                                value: _persentasePendanaan / 100,
+                                backgroundColor: Colors.grey,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color.fromARGB(255, 92, 129, 95)),
+                                strokeWidth: 10.0,
+                              ),
+                            ),
+                            Text(
+                              '${_persentasePendanaan.toStringAsFixed(1)}%',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
             SizedBox(height: 30.0),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),

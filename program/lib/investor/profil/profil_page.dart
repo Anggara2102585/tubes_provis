@@ -47,8 +47,7 @@ class ProfilPageState extends State<ProfilPage> {
           style: titleTextStyle,
         ),
       ),
-      body: 
-      Padding(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _ProfilPageContent(),
       ),
