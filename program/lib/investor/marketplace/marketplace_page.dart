@@ -1,5 +1,22 @@
 import 'package:flutter/material.dart';
 
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Marketplace App',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: MarketplacePage(),
+    );
+  }
+}
+
 class MarketplacePage extends StatefulWidget {
   @override
   _MarketplacePageState createState() => _MarketplacePageState();
@@ -17,10 +34,14 @@ class _MarketplacePageState extends State<MarketplacePage> {
   String formatCurrency(double amount) {
     String formattedValue = 'Rp ' +
         amount.toStringAsFixed(0).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match match) => '${match[1]}.',
-        );
+              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+              (Match match) => '${match[1]}.',
+            );
     return formattedValue;
+  }
+
+  void showFilterOptions() {
+    // Implement filter options logic here
   }
 
   @override
@@ -48,12 +69,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
                       ),
                     ),
                     SizedBox(width: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Perform search logic here
-                        // You can use the `searchQuery` variable to access the user's input
-                      },
-                      child: Text('Cari'),
+                    ElevatedButton.icon(
+                      onPressed: showFilterOptions,
+                      icon: Icon(Icons.filter_list),
+                      label: Text('Filter'),
                     ),
                   ],
                 ),
@@ -64,7 +83,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 progress: 70,
                 totalLoan: 5000000,
                 date: 'June 1, 2023',
-                creditScore: 750,
+                id: 123,
                 bagiHasil: 8,
               ),
               SizedBox(height: 20.0),
@@ -73,7 +92,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 progress: 50,
                 totalLoan: 3000000,
                 date: 'June 2, 2023',
-                creditScore: 800,
+                id: 234,
                 bagiHasil: 8,
               ),
             ],
@@ -130,7 +149,7 @@ class UMKMCard extends StatefulWidget {
   final int progress;
   final double totalLoan;
   final String date;
-  final int creditScore;
+  final int id;
   final int bagiHasil;
 
   UMKMCard({
@@ -138,7 +157,7 @@ class UMKMCard extends StatefulWidget {
     required this.progress,
     required this.totalLoan,
     required this.date,
-    required this.creditScore,
+    required this.id,
     required this.bagiHasil,
   });
 
@@ -187,7 +206,7 @@ class _UMKMCardState extends State<UMKMCard> {
                           borderRadius: BorderRadius.circular(5.0),
                         ),
                         child: Text(
-                          'Credit Score: ${widget.creditScore}',
+                          'Id: ${widget.id}',
                           style: TextStyle(
                             fontSize: 14.0,
                             color: Colors.white,
@@ -257,21 +276,17 @@ class _UMKMCardState extends State<UMKMCard> {
                             children: [
                               CircularProgressIndicator(
                                 value: widget.progress / 100,
-                                backgroundColor: Colors.grey[300],
+                                strokeWidth: 4.0,
                                 valueColor:
                                     AlwaysStoppedAnimation<Color>(Colors.green),
-                                strokeWidth: 6.0,
+                                backgroundColor: Colors.grey[300],
                               ),
-                              Align(
-                                alignment: Alignment.center,
-                                child: Transform.translate(
-                                  offset: Offset(0, 2.5),
-                                  child: Text(
-                                    '${widget.progress}%',
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              Center(
+                                child: Text(
+                                  '${widget.progress}%',
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -280,37 +295,17 @@ class _UMKMCardState extends State<UMKMCard> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16.0),
+                    SizedBox(height: 8.0),
                     Text(
-                      'Tanggal Akhir Crowdfunding:',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                      ),
+                      'Total Pinjaman: ${formatCurrency(widget.totalLoan)}',
+                      style: TextStyle(fontSize: 16.0),
                     ),
-                    SizedBox(height: 4.0),
+                    SizedBox(height: 8.0),
                     Text(
-                      '${widget.date}',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.grey[600],
-                      ),
+                      'Tanggal crowdfunding: ${widget.date}',
+                      style: TextStyle(fontSize: 16.0),
                     ),
                   ],
-                ),
-                Text(
-                  'Total Pinjaman:',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-                SizedBox(width: 4.0),
-                Text(
-                  formatCurrency(widget.totalLoan),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
                 ),
               ],
             ),
