@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'dart:html' as html;
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_crop/image_crop.dart' as crop;
+// import 'package:image_crop/image_crop.dart' as crop;
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
