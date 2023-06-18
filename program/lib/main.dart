@@ -9,6 +9,7 @@ import 'package:myapp/investor/beranda/notification_page.dart';
 import 'package:myapp/investor/beranda/tarikdana_page.dart';
 import 'package:myapp/investor/beranda/topup_page.dart';
 import 'package:myapp/investor/marketplace/marketplace_page.dart';
+import 'package:myapp/investor/marketplace/detail_marketplace.dart';
 import 'package:myapp/investor/portofolio/detail_portofolio.dart';
 import 'package:myapp/investor/portofolio/portofolio_page.dart';
 import 'package:myapp/investor/profil/edit_profil.dart';
@@ -29,6 +30,7 @@ void main() => runApp(MaterialApp(
         '/topup': (context) => TopUpPage(),
         '/tarikdana': (context) => TarikDanaPage(),
         '/marketplace': (context) => MarketplacePage(),
+        '/detail-marketplace': (context) => DetailMarketplacePage(),
         '/portofolio': (context) => PortofolioPage(),
         '/profil': (context) => ProfilPage(),
         '/register': (context) => RoleSelectionPage(),

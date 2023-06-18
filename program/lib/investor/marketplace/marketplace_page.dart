@@ -74,22 +74,32 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 ),
               ),
               SizedBox(height: 20.0),
-              UMKMCard(
-                name: 'UMKM ABC',
-                progress: 70,
-                totalLoan: 5000000,
-                date: 'June 1, 2023',
-                id: 123,
-                bagiHasil: 8,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/detail-marketplace');
+                },
+                child: UMKMCard(
+                  name: 'UMKM ABC',
+                  progress: 70,
+                  totalLoan: 5000000,
+                  date: 'June 1, 2023',
+                  id: 123,
+                  bagiHasil: 8,
+                ),
               ),
               SizedBox(height: 20.0),
-              UMKMCard(
-                name: 'UMKM XYZ',
-                progress: 50,
-                totalLoan: 3000000,
-                date: 'June 2, 2023',
-                id: 234,
-                bagiHasil: 8,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/detail-marketplace');
+                },
+                child: UMKMCard(
+                  name: 'UMKM XYZ',
+                  progress: 50,
+                  totalLoan: 3000000,
+                  date: 'June 2, 2023',
+                  id: 234,
+                  bagiHasil: 8,
+                ),
               ),
             ],
           ),

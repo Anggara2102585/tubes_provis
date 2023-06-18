@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() => runApp(MyApp());
+import '../../assets/font.dart';
 
 class UMKM {
   final String logo;
@@ -34,13 +33,14 @@ class Pendanaan {
   });
 }
 
-class MyApp extends StatefulWidget {
+class DetailMarketplacePage extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _DetailMarketplacePageState createState() => _DetailMarketplacePageState();
 }
 
-class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 0;
+class _DetailMarketplacePageState extends State<DetailMarketplacePage> {
+  int _selectedIndex = 0; // Set default selected index to 2 (Portofolio)
+
   TextEditingController searchController = TextEditingController();
   List<UMKM> filteredUMKM = [];
 
@@ -103,7 +103,17 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(primarySwatch: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('UMKM Cards'),
+          title: Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              Text('Detail'),
+            ],
+          ),
         ),
         body: Column(
           children: [
