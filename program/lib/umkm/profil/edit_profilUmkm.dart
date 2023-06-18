@@ -3,33 +3,32 @@ import 'dart:typed_data';
 import 'dart:html' as html;
 import 'dart:io';
 import 'package:flutter/material.dart';
-// import 'package:image_crop/image_crop.dart' as crop;
-// import 'package:image_picker_web/image_picker_web.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:myapp/models/profil.dart';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 
-class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
-
+class EditProfileUmkmPage extends StatefulWidget {
+  const EditProfileUmkmPage({Key? key}) : super(key: key);
   @override
-  _EditProfilePageState createState() => _EditProfilePageState();
+  _EditProfilState createState() => _EditProfilState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfilState extends State<EditProfileUmkmPage> {
   bool isEditMode = false;
-  Uint8List? _selectedImage;
-  // final ImagePickerWeb _imagePicker = ImagePickerWeb();
-  // final models = ActivityCubit();
-  // var futureProfil = ActivityCubit.fetchData();
-  late ActivityProfil futureProfil;
-  TextEditingController nameController = TextEditingController();
+
+  // late ActivityCubit future
+  TextEditingController umkmNameController = TextEditingController();
+  TextEditingController ownerController = TextEditingController();
+  TextEditingController omsetController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController typeController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  TextEditingController usernameController = TextEditingController();
+  TextEditingController userusernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   File? _image;
@@ -53,71 +52,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  Future<void> _saveImage() async {
-    if (_image != null) {
-      try {
-        // Get the application documents directory
-
-        final directory = await getApplicationDocumentsDirectory();
-
-        // Generate a unique filename for the image
-        final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-        // final fileName = _image!.path;
-        final fileName = 'image_$timestamp.jpg';
-
-        // Check if the directory exists, create it if necessary
-        if (!(await directory.exists())) {
-          await directory.create(recursive: true);
-        }
-        // Create the destination file path
-        final destinationPath = '${directory.path}/$fileName';
-
-        // Copy the image file to the destination path
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(destinationPath)),
-        );
-        await _image!.copy(destinationPath);
-
-        // Show a success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image saved successfully!')),
-        );
-      } catch (e) {
-        // Show an error message if the image saving fails
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save image!')),
-        );
-        print(e);
-      }
-    } else {
-      // Show a message if no image is selected
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No image selected!')),
-      );
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    // futureProfil = models.fetchData() as ActivityProfil;
-    // Initialize the text field values with previous data
-    nameController.text = 'User Name';
+    umkmNameController.text = "My Business";
+    ownerController.text = "Owner Name";
+    omsetController.text = '9.000.000';
+    descriptionController.text =
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.";
+    typeController.text = 'Usaha Mebel';
+    usernameController.text = 'User Name';
     emailController.text = 'user@example.com';
     phoneController.text = '+123456789';
     addressController.text = '123 Street, City';
-    usernameController.text = 'user123';
+    userusernameController.text = 'user123';
     passwordController.text = '********';
   }
 
   @override
   void dispose() {
     // Dispose the text editing controllers
-    nameController.dispose();
+    umkmNameController.dispose();
+    ownerController.dispose();
+    omsetController.dispose();
+    descriptionController.dispose();
+    typeController.dispose();
+    usernameController.dispose();
     emailController.dispose();
     phoneController.dispose();
     addressController.dispose();
-    usernameController.dispose();
+    userusernameController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -150,11 +114,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 setState(() {
                   isEditMode = false;
                   // Reset the form fields with previous values
-                  nameController.text = 'User Name';
+                  umkmNameController.text = "My Business";
+                  ownerController.text = "Owner Name";
+                  omsetController.text = '9.000.000';
+                  descriptionController.text =
+                      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.";
+                  typeController.text = 'Usaha Mebel';
+                  usernameController.text = 'User Name';
                   emailController.text = 'user@example.com';
                   phoneController.text = '+123456789';
                   addressController.text = '123 Street, City';
-                  usernameController.text = 'user123';
+                  userusernameController.text = 'user123';
                   passwordController.text = '********';
                   _image = null;
                 });
@@ -195,36 +165,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: const Text('Select Image'),
                   )
                 : const SizedBox(height: 0),
-            ElevatedButton(onPressed: _saveImage, child: const Text('Save')),
-            // const SizedBox(height: 20),
-            // GestureDetector(
-            //   onTap: () {},
-            //   child: Container(
-            //     decoration: BoxDecoration(
-            //       shape: BoxShape.circle,
-            //       border: Border.all(color: Theme.of(context).primaryColor),
-            //     ),
-            //     // child: CircleAvatar(
-            //     //   radius: 80,
-            //     //   backgroundImage: _selectedImage != null
-            //     //       ? MemoryImage(_selectedImage!)
-            //     //       : const NetworkImage('https://placehold.co/400x400.png'),
-            //     // ),
-            //   ),
-            // ),
             const SizedBox(height: 10),
             isEditMode
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: TextField(
-                      controller: nameController,
+                      controller: umkmNameController,
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                   )
                 : Text(
-                    nameController.text,
+                    umkmNameController.text,
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),
@@ -233,6 +186,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
+                  ListTile(
+                    leading: const Icon(Icons.man),
+                    title: const Text('Pemilik Usaha'),
+                    subtitle: isEditMode
+                        ? TextField(
+                            controller: ownerController,
+                          )
+                        : Text(ownerController.text),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.business),
+                    title: const Text('Jenis Usaha'),
+                    subtitle: isEditMode
+                        ? TextField(
+                            controller: typeController,
+                          )
+                        : Text(typeController.text),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.money),
+                    title: const Text('Omset Tahunan'),
+                    subtitle: isEditMode
+                        ? TextField(
+                            controller: omsetController,
+                          )
+                        : Text("Rp${omsetController.text}"),
+                  ),
+                  const Divider(),
                   ListTile(
                     leading: const Icon(Icons.email),
                     title: const Text('Email'),
@@ -264,13 +247,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   const Divider(),
                   ListTile(
+                    leading: const Icon(Icons.description_outlined),
+                    title: const Text('Deskripsi Usaha'),
+                    subtitle: isEditMode
+                        ? TextField(
+                            controller: descriptionController,
+                          )
+                        : Text(descriptionController.text),
+                  ),
+                  const Divider(),
+                  ListTile(
                     leading: const Icon(Icons.person),
                     title: const Text('Username'),
                     subtitle: isEditMode
                         ? TextField(
-                            controller: usernameController,
+                            controller: userusernameController,
                           )
-                        : Text(usernameController.text),
+                        : Text(userusernameController.text),
                   ),
                   const Divider(),
                   ListTile(
