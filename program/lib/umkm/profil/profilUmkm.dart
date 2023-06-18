@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/assets/font.dart';
 import 'package:myapp/models/profil.dart';
+// import 'package:myapp/main.dart' as app;
 // import 'package:myapp/models/profil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilUmkmPage extends StatefulWidget {
   const ProfilUmkmPage({super.key});
@@ -13,6 +15,34 @@ class ProfilUmkmPage extends StatefulWidget {
 class ProfilPageState extends State<ProfilUmkmPage> {
   int _selectedIndex = 2;
   var cubit = ActivityCubit();
+
+  late int id_akun;
+
+  @override
+  void initState() {
+    super.initState();
+    _getId();
+  }
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
+
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
       // Kembali ke halaman sebelumnya

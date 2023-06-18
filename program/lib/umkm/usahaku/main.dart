@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/pinjaman_belum_lunas': (context) => PinjamanBelumLunas(),
         '/pinjaman_lunas': (context) => PinjamanLunas(),
-        '/beranda': (context) => HomePage(),
+        '/beranda': (context) => HomePageUMKM(),
       },
     );
   }

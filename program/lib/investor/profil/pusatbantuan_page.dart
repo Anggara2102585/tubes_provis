@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/assets/font.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum MetodePusatBantuan { transferBank, eWallet }
 
@@ -22,6 +23,33 @@ class PusatBantuanPage extends StatefulWidget {
 }
 
 class PusatBantuanPageState extends State<PusatBantuanPage> {
+  late int id_akun;
+
+  @override
+  void initState() {
+    super.initState();
+    _getId();
+  }
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

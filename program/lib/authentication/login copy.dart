@@ -12,7 +12,16 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  SharedPreferences? _prefs;
+
+  void _login(BuildContext context, int id_akun, int jenis_user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('id_akun', id_akun);
+    if (jenis_user == 1) {
+      Navigator.pushReplacementNamed(context, '/berandaUMKM');
+    } else {
+      Navigator.pushReplacementNamed(context, '/beranda');
+    }
+  }
 
   @override
   void dispose() {
@@ -35,48 +44,38 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _initializePreferences();
-  }
-
-  Future<void> _initializePreferences() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
-
   Future<Map<String, dynamic>?> login(String username, String password) async {
-  final url = 'http://127.0.0.1:8000/login'; // Replace with your actual login API URL
+    final url =
+        'http://127.0.0.1:8000/login'; // Replace with your actual login API URL
 
-  try {
-    final response = await http.post(
-      Uri.parse(url),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      // Successful login
-      final data = jsonDecode(response.body);
-      return {
-        'id_akun': data['id_akun'],
-        'jenis_user': data['jenis_user'],
-      };
-    } else {
-      // Handle login error (e.g., display an error message)
+      if (response.statusCode == 200) {
+        // Successful login
+        final data = jsonDecode(response.body);
+        return {
+          'id_akun': data['id_akun'],
+          'jenis_user': data['jenis_user'],
+        };
+      } else {
+        // Handle login error (e.g., display an error message)
+        return null;
+      }
+    } catch (e) {
+      // Handle any exceptions during the login process
       return null;
     }
-  } catch (e) {
-    // Handle any exceptions during the login process
-    return null;
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,28 +116,30 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 16.0),
               ElevatedButton(
-                child: Text(
-                  'Login',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    // Perform login API call and retrieve the response
-                    final response = await login(usernameController.text, passwordController.text);
-                    
-                    if (response != null) {
-                      // Store the login result in shared preferences
-                      _prefs?.setInt('id_akun', response['id_akun']);
-                      _prefs?.setInt('jenis_user', response['jenis_user']);
+                  child: Text(
+                    'Login',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      // Perform login API call and retrieve the response
+                      final response = await login(
+                          usernameController.text, passwordController.text);
 
-                      // Navigate to the home page
-                      Navigator.pushNamed(context, '/beranda');
-                    } else {
-                      // Handle login error (e.g., display an error message)
+                      if (response != null) {
+                        // Store the login result in shared preferences
+                        // _prefs?.setInt('id_akun', response['id_akun']);
+                        // _prefs?.setInt('jenis_user', response['jenis_user']);
+                        _login(context, response['id_akun'],
+                            response['jenis_user']);
+
+                        // // Navigate to the home page
+                        // Navigator.pushNamed(context, '/beranda');
+                      } else {
+                        // Handle login error (e.g., display an error message)
+                      }
                     }
-                  }
-                }
-              ),
+                  }),
               SizedBox(height: 16.0),
               TextButton(
                 child: Text(
