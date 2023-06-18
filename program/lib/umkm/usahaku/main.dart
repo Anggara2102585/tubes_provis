@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'pendanaan_belum_lunas.dart';
-import 'pendanaan_lunas.dart';
+import 'pinjaman_belum_lunas.dart';
+import 'pinjaman_lunas.dart';
+import 'add_pinjaman.dart';
 import '../beranda/beranda.dart';
 
 void main() {
@@ -20,8 +21,8 @@ class MyApp extends StatelessWidget {
       ),
       home: UsahakuPage(),
       routes: {
-        '/pendanaan_belum_lunas': (context) => PendanaanBelumLunas(),
-        '/pendanaan_lunas': (context) => PendanaanLunas(),
+        '/pinjaman_belum_lunas': (context) => PinjamanBelumLunas(),
+        '/pinjaman_lunas': (context) => PinjamanLunas(),
         '/beranda': (context) => HomePage(),
       },
     );
@@ -56,7 +57,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
   }
 
   int adaBelumLunas = 1;
-  double _persentasePendanaan = 60.0; // Persentase pendanaan (contoh)
+  double _persentasePinjaman = 60.0; // Persentase pinjaman (contoh)
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +113,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  'Pendanaan Belum Lunas',
+                  'Pinjaman Belum Lunas',
                   style: TextStyle(fontSize: 20.0),
                 ),
               )
@@ -120,19 +121,19 @@ class _UsahakuPageState extends State<UsahakuPage> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  'Pendanaan Aktif',
+                  'Pinjaman Aktif',
                   style: TextStyle(fontSize: 20.0),
                 ),
               ),
             SizedBox(height: 8.0),
-            // belum ada pendanaan
+            // belum ada pinjaman
             if (adaBelumLunas == 0)
               Column(
                 children: [
                   SizedBox(height: 16.0),
                   Center(
                     child: Text(
-                      'Anda belum memiliki pendanaan aktif. Buat baru!',
+                      'Anda belum memiliki pinjaman aktif. Buat baru!',
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -140,7 +141,12 @@ class _UsahakuPageState extends State<UsahakuPage> {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/add_pengajuan');
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return PinjamanForm();
+                          },
+                        );
                       },
                       child: Icon(Icons.add),
                       style: ElevatedButton.styleFrom(
@@ -151,7 +157,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                   ),
                 ],
               )
-            // sudah ada pendanaan tpi masih ongoing
+            // sudah ada pinjaman tpi masih ongoing
             else if (adaBelumLunas == 1)
               Container(
                 width: double.infinity,
@@ -164,8 +170,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                       padding: EdgeInsets.all(8.0),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(
-                              context, '/pendanaan_belum_lunas');
+                          Navigator.pushNamed(context, '/pinjaman_belum_lunas');
                         },
                         child: Container(
                           width: 390.0,
@@ -180,7 +185,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Text(
-                                        'Batas Pendanaan',
+                                        'Batas Pinjaman',
                                         style: TextStyle(fontSize: 12.0),
                                       ),
                                       Text(
@@ -191,7 +196,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                   ),
                                   SizedBox(height: 8.0),
                                   Text(
-                                    'Judul Pendanaan',
+                                    'Judul Pinjaman',
                                     style: TextStyle(
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.bold),
@@ -238,7 +243,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                           child: GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(
-                                  context, '/pendanaan_belum_lunas');
+                                  context, '/pinjaman_belum_lunas');
                             },
                             child: Container(
                               width: 390.0,
@@ -265,7 +270,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                       ),
                                       SizedBox(height: 8.0),
                                       Text(
-                                        'Judul Pendanaan',
+                                        'Judul Pinjaman',
                                         style: TextStyle(
                                             fontSize: 16.0,
                                             fontWeight: FontWeight.bold),
@@ -302,7 +307,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          'Status Pendanaan',
+                          'Status Pinjaman',
                           style: TextStyle(
                               fontSize: 16.0, fontWeight: FontWeight.bold),
                         ),
@@ -314,7 +319,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                               height: 80.0,
                               width: 80.0,
                               child: CircularProgressIndicator(
-                                value: _persentasePendanaan / 100,
+                                value: _persentasePinjaman / 100,
                                 backgroundColor: Colors.grey,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                     Color.fromARGB(255, 92, 129, 95)),
@@ -322,7 +327,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                               ),
                             ),
                             Text(
-                              '${_persentasePendanaan.toStringAsFixed(1)}%',
+                              '${_persentasePinjaman.toStringAsFixed(1)}%',
                               style: TextStyle(
                                   fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
@@ -337,7 +342,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                'Pendanaan Lunas',
+                'Pinjaman Lunas',
                 style: TextStyle(fontSize: 20.0),
               ),
             ),
@@ -353,7 +358,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                     padding: EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/pendanaan_lunas');
+                        Navigator.pushNamed(context, '/pinjaman_lunas');
                       },
                       child: Container(
                         width: 300.0,
@@ -379,7 +384,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
-                                  'Judul Pendanaan',
+                                  'Judul Pinjaman',
                                   style: TextStyle(
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.bold),
