@@ -6,10 +6,7 @@ import 'add_pinjaman.dart';
 
 import 'package:myapp/umkm/profil/edit_profilUmkm.dart';
 
-import 'pinjaman_belum_lunas.dart';
-import 'pinjaman_lunas.dart';
 import 'pinjaman_aktif.dart';
-import 'add_pinjaman.dart';
 
 import '../beranda/beranda.dart';
 import '../profil/profilUmkm.dart';
@@ -36,7 +33,6 @@ class MyApp extends StatelessWidget {
         '/pinjaman_lunas': (context) => PinjamanLunas(),
         '/pinjaman_aktif': (context) => PinjamanAktif(),
         '/beranda': (context) => HomePageUMKM(),
-        // '/beranda': (context) => HomePage(),
         '/profil': (context) => ProfilUmkmPage(),
         '/edit_profilUmkm': (context) => EditProfileUmkmPage(),
         '/pusatbantuan': (context) => const PusatBantuanPage(),
@@ -51,7 +47,7 @@ class UsahakuPage extends StatefulWidget {
 }
 
 class _UsahakuPageState extends State<UsahakuPage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -61,13 +57,13 @@ class _UsahakuPageState extends State<UsahakuPage> {
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
       case 0:
-        // Do nothing or handle home page logic
+        Navigator.pushNamed(context, '/berandaUMKM');
         break;
       case 1:
-        Navigator.pushNamed(context, '/beranda');
+        // Do nothing or handle home page logic
         break;
       case 2:
-        Navigator.pushNamed(context, '/profil');
+        Navigator.pushNamed(context, '/profilUmkm');
         break;
     }
   }

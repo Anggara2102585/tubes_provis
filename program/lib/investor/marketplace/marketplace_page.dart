@@ -20,7 +20,7 @@ class MarketplacePage extends StatefulWidget {
 
 class _MarketplacePageState extends State<MarketplacePage> {
   String searchQuery = '';
-
+  int _selectedIndex = 1;
   void setSearchQuery(String query) {
     setState(() {
       searchQuery = query;
@@ -34,6 +34,33 @@ class _MarketplacePageState extends State<MarketplacePage> {
               (Match match) => '${match[1]}.',
             );
     return formattedValue;
+  }
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) {
+      // Kembali ke halaman sebelumnya
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+
+    // Navigate to the corresponding page based on the selected index
+    switch (_selectedIndex) {
+      case 0:
+        Navigator.pushNamed(context, '/beranda');
+        break;
+      case 1:
+        // do nothing
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/portofolio');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profil');
+        break;
+    }
   }
 
   void showFilterOptions() {
@@ -74,68 +101,61 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 ),
               ),
               SizedBox(height: 20.0),
-              UMKMCard(
-                name: 'UMKM ABC',
-                progress: 70,
-                totalLoan: 5000000,
-                date: 'June 1, 2023',
-                id: 123,
-                bagiHasil: 8,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/detail-marketplace');
+                },
+                child: UMKMCard(
+                  name: 'UMKM ABC',
+                  progress: 70,
+                  totalLoan: 5000000,
+                  date: 'June 1, 2023',
+                  id: 123,
+                  bagiHasil: 8,
+                ),
               ),
               SizedBox(height: 20.0),
-              UMKMCard(
-                name: 'UMKM XYZ',
-                progress: 50,
-                totalLoan: 3000000,
-                date: 'June 2, 2023',
-                id: 234,
-                bagiHasil: 8,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/detail-marketplace');
+                },
+                child: UMKMCard(
+                  name: 'UMKM XYZ',
+                  progress: 50,
+                  totalLoan: 3000000,
+                  date: 'June 2, 2023',
+                  id: 234,
+                  bagiHasil: 8,
+                ),
               ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Marketplace',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart),
-            label: 'Portofolio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-        currentIndex: 1, // Set the current index to 1 (Marketplace)
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.green[100],
-        onTap: (index) {
-          if (index == 1) {
-            // Do nothing or handle marketplace page logic
-          } else {
-            // Navigate to the corresponding page based on the selected index
-            switch (index) {
-              case 0:
-                Navigator.pushReplacementNamed(context, '/beranda');
-                break;
-              case 2:
-                Navigator.pushReplacementNamed(context, '/portofolio');
-                break;
-              case 3:
-                Navigator.pushReplacementNamed(context, '/profil');
-                break;
-            }
-          }
-        },
-      ),
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart),
+              label: 'Marketplace',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.pie_chart),
+              label: 'Portofolio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profil',
+            ),
+          ],
+          currentIndex:
+              _selectedIndex, // Set the current index to 1 (Marketplace)
+          selectedItemColor: Colors.green,
+          unselectedItemColor: Colors.green[100],
+          onTap: _onItemTapped),
     );
   }
 }

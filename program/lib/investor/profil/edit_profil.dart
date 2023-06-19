@@ -22,26 +22,26 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   bool isEditMode = false;
   Uint8List? _selectedImage;
-  late int id_akun;
+  // late int id_akun;
 
-  void _getId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      id_akun = prefs.getInt('id_akun') ?? 0;
-    });
-    if (id_akun == 0) {
-      _goToLoginPage();
-    }
-  }
+  // void _getId() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     id_akun = prefs.getInt('id_akun') ?? 0;
+  //   });
+  //   if (id_akun == 0) {
+  //     _goToLoginPage();
+  //   }
+  // }
 
-  void _goToLoginPage() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/',
-      (route) =>
-          false, // use (route) => false to remove all existing routes, effectively clearing the stack
-    );
-  }
+  // void _goToLoginPage() {
+  //   Navigator.pushNamedAndRemoveUntil(
+  //     context,
+  //     '/',
+  //     (route) =>
+  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
+  //   );
+  // }
 
   // final ImagePickerWeb _imagePicker = ImagePickerWeb();
   // final models = ActivityCubit();
@@ -122,7 +122,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _getId();
+    // _getId();
     // futureProfil = models.fetchData() as ActivityProfil;
     // Initialize the text field values with previous data
     nameController.text = 'User Name';
@@ -130,7 +130,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     phoneController.text = '+123456789';
     addressController.text = '123 Street, City';
     usernameController.text = 'user123';
-    passwordController.text = '********';
+    // passwordController.text = '********';
   }
 
   @override
@@ -141,7 +141,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     phoneController.dispose();
     addressController.dispose();
     usernameController.dispose();
-    passwordController.dispose();
+    // passwordController.dispose();
     super.dispose();
   }
 
@@ -178,7 +178,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   phoneController.text = '+123456789';
                   addressController.text = '123 Street, City';
                   usernameController.text = 'user123';
-                  passwordController.text = '********';
+                  // passwordController.text = '********';
                   _image = null;
                 });
               },
@@ -218,7 +218,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: const Text('Select Image'),
                   )
                 : const SizedBox(height: 0),
-            ElevatedButton(onPressed: _saveImage, child: const Text('Save')),
+            // ElevatedButton(onPressed: _saveImage, child: const Text('Save')),
             // const SizedBox(height: 20),
             // GestureDetector(
             //   onTap: () {},
@@ -295,16 +295,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           )
                         : Text(usernameController.text),
                   ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.lock),
-                    title: const Text('Password'),
-                    subtitle: isEditMode
-                        ? TextField(
-                            controller: passwordController,
-                          )
-                        : Text(passwordController.text),
-                  ),
+                  // const Divider(),
+                  // ListTile(
+                  //   leading: const Icon(Icons.lock),
+                  //   title: const Text('Password'),
+                  //   subtitle: isEditMode
+                  //       ? TextField(
+                  //           controller: passwordController,
+                  //         )
+                  //       : Text(passwordController.text),
+                  // ),
                 ],
               ),
             ),
