@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
+
 import 'pinjaman_belum_lunas.dart';
 import 'pinjaman_lunas.dart';
 import 'add_pinjaman.dart';
+
+import 'package:myapp/umkm/profil/edit_profilUmkm.dart';
+import 'pendanaan_belum_lunas.dart';
+import 'pendanaan_lunas.dart';
+
+import 'pinjaman_belum_lunas.dart';
+import 'pinjaman_lunas.dart';
+import 'add_pinjaman.dart';
+
 import '../beranda/beranda.dart';
+import '../profil/profilUmkm.dart';
+import 'package:myapp/investor/profil/pusatbantuan_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +36,10 @@ class MyApp extends StatelessWidget {
         '/pinjaman_belum_lunas': (context) => PinjamanBelumLunas(),
         '/pinjaman_lunas': (context) => PinjamanLunas(),
         '/beranda': (context) => HomePageUMKM(),
+        // '/beranda': (context) => HomePage(),
+        '/profil': (context) => ProfilUmkmPage(),
+        '/edit_profilUmkm': (context) => EditProfileUmkmPage(),
+        '/pusatbantuan': (context) => const PusatBantuanPage(),
       },
     );
   }
