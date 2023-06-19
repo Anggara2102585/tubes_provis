@@ -313,7 +313,7 @@ def process_topup(topup_request: schemas.TopUp, db: Session = Depends(get_db)):
 
     return {"message": "Topup berhasil"}
 
-@app.post("/saldo")
+@app.post("/saldo", response_model=schemas.Saldo)
 def get_saldo(get_saldo_request: schemas.GetSaldo, db: Session = Depends(get_db)):
     # Retrieve the corresponding user based on jenis_user
     if get_saldo_request.jenis_user == 1:
