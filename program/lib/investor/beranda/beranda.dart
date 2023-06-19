@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../assets/font.dart';
 import '../../shared_pref.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   @override
@@ -27,6 +29,34 @@ class _HomePageState extends State<HomePage> {
       id_akun = sharedPrefs.id_akun;
       jenis_user = sharedPrefs.jenis_user;
     });
+  }
+
+  Future<Map<dynamic, dynamic>> fetchData() async {
+    final String apiUrl = 'http://127.0.0.1:8000/pendana/beranda';
+    await _initIdAkun();
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id_akun': id_akun}),
+    );
+    // Assuming the data fetched from the API is in the following format
+    final responseData = jsonDecode(response.body);
+    final Map<dynamic, dynamic> data = {
+      'nama_pendana': responseData['nama_pendana'] ?? '',
+      'saldo': responseData['saldo'] ?? 0,
+      'total_pendanaan': responseData['total_pendanaan'] ?? 0,
+      'total_bagi_hasil': responseData['total_bagi_hasil'] ?? 0,
+      'jumlah_didanai_aktif': responseData['jumlah_didanai_aktif'] ?? 0,
+    };
+
+    if (response.statusCode == 200) {
+      // Fetch data successful, handle the response
+    } else {
+      // Registration failed, throw an exception or return an empty map
+      throw Exception('An error occurred during registration.');
+    }
+    return data;
   }
 
   void _onItemTapped(int index) {
@@ -81,15 +111,27 @@ class _HomePageState extends State<HomePage> {
                         radius: 40,
                       ),
                       SizedBox(width: 24.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$jenis_user + $id_akun',
-                            // 'id_akun',
-                            style: bodyTextStyle,
-                          ),
-                        ],
+                      FutureBuilder<Map<dynamic, dynamic>>(
+                        future: fetchData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final responseData = snapshot.data!;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  responseData['nama_pendana'] ?? '',
+                                  // '$id_akun',
+                                  style: TextStyle(fontSize: 20.0),
+                                ),
+                              ],
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            return CircularProgressIndicator();
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -121,9 +163,28 @@ class _HomePageState extends State<HomePage> {
                                   style: bodyBoldTextStyle,
                                 ),
                                 SizedBox(height: 8.0),
-                                Text(
-                                  'Rp 1.000.000',
-                                  style: bodyTextStyle,
+                                FutureBuilder<Map<dynamic, dynamic>>(
+                                  future: fetchData(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      final responseData = snapshot.data!;
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            responseData['saldo'].toString(),
+                                            // '$id_akun',
+                                            style: TextStyle(fontSize: 20.0),
+                                          ),
+                                        ],
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      return CircularProgressIndicator();
+                                    }
+                                  },
                                 ),
                               ],
                             ),
@@ -178,8 +239,31 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(height: 16.0),
                         Text(
-                          'Anda sedang mendanai 0 mitra',
+                          'Anda sedang mendanai ',
                           style: captionTextStyle,
+                        ),
+                        FutureBuilder<Map<dynamic, dynamic>>(
+                          future: fetchData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final responseData = snapshot.data!;
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    responseData['jumlah_didanai_aktif']
+                                        .toString(),
+                                    // '$id_akun',
+                                    style: TextStyle(fontSize: 20.0),
+                                  ),
+                                ],
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          },
                         ),
                         SizedBox(height: 16.0),
                         LayoutBuilder(
@@ -201,9 +285,32 @@ class _HomePageState extends State<HomePage> {
                                         style: bodyBoldTextStyle,
                                       ),
                                       SizedBox(height: 8.0),
-                                      Text(
-                                        'Rp 1.000.000',
-                                        style: bodyTextStyle,
+                                      FutureBuilder<Map<dynamic, dynamic>>(
+                                        future: fetchData(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            final responseData = snapshot.data!;
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  responseData[
+                                                          'total_pendanaan']
+                                                      .toString(),
+                                                  // '$id_akun',
+                                                  style:
+                                                      TextStyle(fontSize: 20.0),
+                                                ),
+                                              ],
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                                'Error: ${snapshot.error}');
+                                          } else {
+                                            return CircularProgressIndicator();
+                                          }
+                                        },
                                       ),
                                     ],
                                   ),
@@ -219,9 +326,32 @@ class _HomePageState extends State<HomePage> {
                                         style: bodyBoldTextStyle,
                                       ),
                                       SizedBox(height: 8.0),
-                                      Text(
-                                        'Rp 1.000.000',
-                                        style: bodyTextStyle,
+                                      FutureBuilder<Map<dynamic, dynamic>>(
+                                        future: fetchData(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            final responseData = snapshot.data!;
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  responseData[
+                                                          'total_bagi_hasil']
+                                                      .toString(),
+                                                  // '$id_akun',
+                                                  style:
+                                                      TextStyle(fontSize: 20.0),
+                                                ),
+                                              ],
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                                'Error: ${snapshot.error}');
+                                          } else {
+                                            return CircularProgressIndicator();
+                                          }
+                                        },
                                       ),
                                     ],
                                   ),
