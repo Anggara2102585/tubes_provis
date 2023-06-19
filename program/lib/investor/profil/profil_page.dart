@@ -39,6 +39,12 @@ class ProfilPageState extends State<ProfilPage> {
           false, // use (route) => false to remove all existing routes, effectively clearing the stack
     );
   }
+  //hapus data sharedpref
+  Future<void> hapusDataUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('id_akun');
+  }
+
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -151,6 +157,7 @@ class _ProfilPageContent extends StatelessWidget {
             ),
             trailing: const Icon(Icons.exit_to_app, color: Colors.red),
             onTap: () {
+              hapusDataUser();
               // Handle 'Keluar' button tap
               // Perform logout action
             },
