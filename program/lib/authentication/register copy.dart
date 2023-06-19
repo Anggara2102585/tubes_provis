@@ -67,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String? selectedProvince;
   String? selectedCity;
   
-  Future<void> registerUser() async {
+  Future<void> registerPendana() async {
     final String apiUrl = 'http://127.0.0.1:8000/register/pendana';
 
     final response = await http.post(
@@ -77,14 +77,19 @@ class _RegisterPageState extends State<RegisterPage> {
         'nama': nameController.text,
         'username': usernameController.text,
         'password': passwordController.text,
-        'ktp': ktpController.text,
-        'selfie': selfieController.text,
+        'foto_ktp': ktpController.text,
+        'foto_selfie': selfieController.text,
       }),
     );
 
     if (response.statusCode == 200) {
       // Registration successful, handle the response
-      var responseData = jsonDecode(response.body);
+      // var responseData = jsonDecode(response.body);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/',
+        (route) => false,
+      );
       // Handle the response data as needed
     } else {
       // Registration failed, show an error message
@@ -444,7 +449,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     } else {
                       // Lakukan tindakan setelah tombol "Daftar" ditekan
                       // Misalnya, Anda dapat menyimpan data pendaftaran dan melanjutkan ke halaman beranda
-                      registerUser();
+                      registerPendana();
                       Navigator.pushNamed(context, '/');
                     }
                   }
