@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../shared_pref.dart';
 
 class PinjamanForm extends StatefulWidget {
   @override
@@ -12,6 +13,25 @@ class _PinjamanFormState extends State<PinjamanForm> {
   TextEditingController _minimalController = TextEditingController();
   TextEditingController _totalController = TextEditingController();
   TextEditingController _dlPenggalanganController = TextEditingController();
+
+  //SharedPref
+  int id_akun = 0;
+  int jenis_user = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initIdAkun();
+  }
+
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
 
   @override
   void dispose() {

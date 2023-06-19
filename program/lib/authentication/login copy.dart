@@ -13,15 +13,16 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  void _login(BuildContext context, int id_akun, int jenis_user) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('id_akun', id_akun);
-    if (jenis_user == 1) {
-      Navigator.pushReplacementNamed(context, '/berandaUMKM');
-    } else {
-      Navigator.pushReplacementNamed(context, '/beranda');
-    }
-  }
+  // void _login(BuildContext context, int id_akun, int jenis_user) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setInt('id_akun', id_akun);
+  //   await prefs.setInt('jenis_user', jenis_user);
+  //   if (jenis_user == 1) {
+  //     Navigator.pushReplacementNamed(context, '/berandaUMKM');
+  //   } else {
+  //     Navigator.pushReplacementNamed(context, '/beranda');
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -44,9 +45,10 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  Future<Map<String, dynamic>?> login(String username, String password) async {
+  Future<Map<String, dynamic>?> _login(
+      BuildContext context, String username, String password) async {
     final url =
-        'http://127.0.0.1:8000/login'; // Replace with your actual login API URL
+        'http://127.0.0.1:8000/login'; // Ganti dengan URL API login yang sebenarnya
 
     try {
       final response = await http.post(
@@ -61,18 +63,25 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (response.statusCode == 200) {
-        // Successful login
+        // Login berhasil
         final data = jsonDecode(response.body);
+        final idAkun = data['id_akun'];
+        final jenisUser = data['jenis_user'];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('id_akun', idAkun);
+        await prefs.setInt('jenis_user', jenisUser);
+
         return {
-          'id_akun': data['id_akun'],
-          'jenis_user': data['jenis_user'],
+          'id_akun': idAkun,
+          'jenis_user': jenisUser,
         };
       } else {
-        // Handle login error (e.g., display an error message)
+        // Handle error saat login (misalnya, tampilkan pesan error)
         return null;
       }
     } catch (e) {
-      // Handle any exceptions during the login process
+      // Handle exception saat proses login
       return null;
     }
   }
@@ -122,21 +131,28 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Perform login API call and retrieve the response
-                      final response = await login(
+                      final response = await _login(context,
                           usernameController.text, passwordController.text);
 
                       if (response != null) {
-                        // Store the login result in shared preferences
-                        // _prefs?.setInt('id_akun', response['id_akun']);
-                        // _prefs?.setInt('jenis_user', response['jenis_user']);
-                        _login(context, response['id_akun'],
-                            response['jenis_user']);
+                        final idAkun = response['id_akun'];
+                        final jenisUser = response['jenis_user'];
 
-                        // // Navigate to the home page
-                        // Navigator.pushNamed(context, '/beranda');
+                        // Simpan nilai di SharedPreferences
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setInt('id_akun', idAkun);
+                        await prefs.setInt('jenis_user', jenisUser);
+
+                        // Navigasi ke halaman yang sesuai berdasarkan jenis_user
+                        if (jenisUser == 1) {
+                          Navigator.pushReplacementNamed(
+                              context, '/berandaUMKM');
+                        } else {
+                          Navigator.pushReplacementNamed(context, '/beranda');
+                        }
                       } else {
-                        // Handle login error (e.g., display an error message)
+                        // Handle error saat login (misalnya, tampilkan pesan error)
                       }
                     }
                   }),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/assets/font.dart';
 import 'package:myapp/models/profil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../shared_pref.dart';
 
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
@@ -13,32 +14,25 @@ class ProfilPage extends StatefulWidget {
 class ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
   var f = ActivityCubit();
-  // late int id_akun;
+
+  //SharedPref
+  int id_akun = 0;
+  int jenis_user = 0;
 
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _initIdAkun();
   }
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
-
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -146,14 +140,15 @@ class _ProfilPageContent extends StatelessWidget {
           const Divider(),
           ListTile(
             title: const Text(
-              'Keluar,',
+              'Keluar',
               style: TextStyle(color: Colors.red),
             ),
             trailing: const Icon(Icons.exit_to_app, color: Colors.red),
             onTap: () {
-              // hapusDataUser();
               // Handle 'Keluar' button tap
               // Perform logout action
+              MySharedPrefs sharedPrefs = MySharedPrefs();
+              sharedPrefs.deleteUser(context);
             },
           ),
         ],

@@ -9,6 +9,7 @@ import 'package:myapp/models/profil.dart';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../shared_pref.dart';
 
 class EditProfileUmkmPage extends StatefulWidget {
   const EditProfileUmkmPage({Key? key}) : super(key: key);
@@ -19,26 +20,18 @@ class EditProfileUmkmPage extends StatefulWidget {
 class _EditProfilState extends State<EditProfileUmkmPage> {
   bool isEditMode = false;
 
-  // late int id_akun;
+  //SharedPref
+  int id_akun = 0;
+  int jenis_user = 0;
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
-
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
 
   // late ActivityCubit future
   TextEditingController umkmNameController = TextEditingController();
@@ -77,7 +70,7 @@ class _EditProfilState extends State<EditProfileUmkmPage> {
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _initIdAkun();
     umkmNameController.text = "My Business";
     ownerController.text = "Owner Name";
     omsetController.text = '9.000.000';

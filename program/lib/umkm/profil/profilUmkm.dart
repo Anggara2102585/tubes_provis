@@ -4,6 +4,7 @@ import 'package:myapp/models/profil.dart';
 // import 'package:myapp/main.dart' as app;
 // import 'package:myapp/models/profil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../shared_pref.dart';
 
 class ProfilUmkmPage extends StatefulWidget {
   const ProfilUmkmPage({super.key});
@@ -16,32 +17,24 @@ class ProfilPageState extends State<ProfilUmkmPage> {
   int _selectedIndex = 2;
   var cubit = ActivityCubit();
 
-  // late int id_akun;
+  //SharedPref
+  int id_akun = 0;
+  int jenis_user = 0;
 
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _initIdAkun();
   }
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
-
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -144,6 +137,8 @@ class _ProfilUmkmContent extends StatelessWidget {
             onTap: () {
               // Handle 'Keluar' button tap
               // Perform logout action
+              MySharedPrefs sharedPrefs = MySharedPrefs();
+              sharedPrefs.deleteUser(context);
             },
           ),
         ],

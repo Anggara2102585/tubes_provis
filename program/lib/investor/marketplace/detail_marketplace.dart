@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../assets/font.dart';
+import '../../shared_pref.dart';
 
 class UMKM {
   final String logo;
@@ -42,6 +43,19 @@ class DetailMarketplacePage extends StatefulWidget {
 
 class DetailMarketplacePageState extends State<DetailMarketplacePage> {
   int _selectedIndex = 0; // Set default selected index to 2 (Portofolio)
+
+  //Sharedpref
+  int id_akun = 0;
+  int jenis_user = 0;
+
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
 
   TextEditingController searchController = TextEditingController();
   List<UMKM> filteredUMKM = [];
@@ -99,6 +113,7 @@ class DetailMarketplacePageState extends State<DetailMarketplacePage> {
   @override
   void initState() {
     super.initState();
+    _initIdAkun();
     filteredUMKM = daftarUMKM;
   }
 

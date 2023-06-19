@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pendana.dart';
+import '../../shared_pref.dart';
 
 class PinjamanBelumLunas extends StatefulWidget {
   @override
@@ -10,9 +11,23 @@ class _PinjamanBelumLunasState extends State<PinjamanBelumLunas>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  //SharedPref
+  int id_akun = 0;
+  int jenis_user = 0;
+
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _initIdAkun();
     _tabController = TabController(length: 2, vsync: this);
   }
 

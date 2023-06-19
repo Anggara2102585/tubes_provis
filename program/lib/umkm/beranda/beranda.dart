@@ -4,6 +4,7 @@ import 'topup_page.dart';
 import 'withdraw_page.dart';
 import '../usahaku/usahaku.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../shared_pref.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,32 +41,24 @@ class HomePageUMKM extends StatefulWidget {
 
 class _HomePageState extends State<HomePageUMKM> {
   int _selectedIndex = 0;
-  // late int id_akun;
+  //SharedPref
+  int id_akun = 0;
+  int jenis_user = 9;
 
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _initIdAkun();
   }
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
-
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -111,7 +104,7 @@ class _HomePageState extends State<HomePageUMKM> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'User Id',
+                            '$jenis_user + $id_akun',
                             // '$id_akun',
                             style: TextStyle(fontSize: 20.0),
                           ),

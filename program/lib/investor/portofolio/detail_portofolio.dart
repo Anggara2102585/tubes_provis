@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'portofolio_page.dart';
 import '../../assets/font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../shared_pref.dart';
 
 class DetailPortofolioPage extends StatefulWidget {
   const DetailPortofolioPage({Key? key}) : super(key: key);
@@ -10,32 +11,24 @@ class DetailPortofolioPage extends StatefulWidget {
 }
 
 class _DetailPortofolioPageState extends State<DetailPortofolioPage> {
-  // late int id_akun;
+  //SharedPref
+  int id_akun = 0;
+  int jenis_user = 0;
 
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _initIdAkun();
   }
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
-
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
