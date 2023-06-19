@@ -445,12 +445,6 @@ def get_portofolio(portofolio_request: schemas.ListPortofolio, db: Session = Dep
     response = schemas.ResponseListPortofolio(pendanaan=portofolio_data)
     return response
 
-""" 
-asdf
-asdf
-adsf
-detail_pendanaan not tested
- """
 @app.post("/detail_pendanaan", response_model=schemas.ResponseDetailPendanaan)
 def get_detail_pendanaan(detail_pendanaan_request: schemas.DetailPendanaan, db: Session = Depends(get_db)):
     # Retrieve the corresponding pendana based on id_akun
@@ -705,6 +699,79 @@ def mengajukan_pendanaan(mengajukan_pendanaan_request: schemas.MengajukanPendana
         deskripsi_pendanaan=pendanaan_data.deskripsi_pendanaan,
         tanggal_pengajuan=pendanaan_data.tanggal_pengajuan,
         tanggal_selesai=pendanaan_data.tanggal_selesai
+    )
+
+    return response
+
+@app.post("/profil_umkm", response_model=schemas.ResponseProfilUMKM)
+def get_profil_umkm(profil_umkm_request: schemas.ProfilUMKM, db: Session = Depends(get_db)):
+    # Retrieve the profile data from the database based on the given `id_akun`
+    profil_umkm = db.query(models.Umkm). \
+        filter(models.Umkm.id_akun == profil_umkm_request.id_akun). \
+        first()
+
+    if not profil_umkm:
+        raise HTTPException(status_code=404, detail="UMKM not found")
+
+    # Prepare the response data
+    response = schemas.ResponseProfilUMKM(
+        nama_pemilik=profil_umkm.nama_pemilik,
+        email=profil_umkm.email,
+        telp=profil_umkm.telp,
+        alamat_usaha=profil_umkm.alamat_usaha,
+        username=profil_umkm.akun.username,
+        nama_umkm=profil_umkm.nama_umkm,
+        omzet=profil_umkm.omzet,
+        deskripsi_umkm=profil_umkm.deskripsi_umkm,
+        jenis_usaha=profil_umkm.jenis_usaha
+    )
+
+    return response
+
+@app.put("/edit_profil_umkm", response_model=schemas.ResponseProfilUMKM)
+def edit_profil_umkm(edit_umkm_request: schemas.EditProfilUMKM, db: Session = Depends(get_db)):
+    # Retrieve the UMKM profile data from the database based on the given `id_akun`
+    profil_umkm = db.query(models.Umkm). \
+        filter(models.Umkm.id_akun == edit_umkm_request.id_akun). \
+        first()
+
+    if not profil_umkm:
+        raise HTTPException(status_code=404, detail="UMKM not found")
+
+    # Update the profile data based on the request body
+    if edit_umkm_request.nama_pemilik is not None:
+        profil_umkm.nama_pemilik = edit_umkm_request.nama_pemilik
+    if edit_umkm_request.email is not None:
+        profil_umkm.email = edit_umkm_request.email
+    if edit_umkm_request.telp is not None:
+        profil_umkm.telp = edit_umkm_request.telp
+    if edit_umkm_request.alamat_usaha is not None:
+        profil_umkm.alamat_usaha = edit_umkm_request.alamat_usaha
+    if edit_umkm_request.username is not None:
+        profil_umkm.akun.username = edit_umkm_request.username
+    if edit_umkm_request.nama_umkm is not None:
+        profil_umkm.nama_umkm = edit_umkm_request.nama_umkm
+    if edit_umkm_request.omzet is not None:
+        profil_umkm.omzet = edit_umkm_request.omzet
+    if edit_umkm_request.deskripsi_umkm is not None:
+        profil_umkm.deskripsi_umkm = edit_umkm_request.deskripsi_umkm
+    if edit_umkm_request.jenis_usaha is not None:
+        profil_umkm.jenis_usaha = edit_umkm_request.jenis_usaha
+
+    # Save the changes to the database
+    db.commit()
+
+    # Prepare the response data
+    response = schemas.ResponseProfilUMKM(
+        nama_pemilik=profil_umkm.nama_pemilik,
+        email=profil_umkm.email,
+        telp=profil_umkm.telp,
+        alamat_usaha=profil_umkm.alamat_usaha,
+        username=profil_umkm.akun.username,
+        nama_umkm=profil_umkm.nama_umkm,
+        omzet=profil_umkm.omzet,
+        deskripsi_umkm=profil_umkm.deskripsi_umkm,
+        jenis_usaha=profil_umkm.jenis_usaha
     )
 
     return response

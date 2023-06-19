@@ -260,3 +260,31 @@ class ResponseMengajukanPendanaan(BaseModel): # Response
 # Bayar Tagihan
 
 # Profil
+class ProfilUMKM(BaseModel): # Request
+    id_akun: int
+class ResponseProfilUMKM(BaseModel): # Response
+    nama_pemilik: str
+    email: str
+    telp: str
+    alamat_usaha: str
+    username: str
+    nama_umkm: str
+    omzet: Decimal
+    deskripsi_umkm: str
+    jenis_usaha: str
+"""
+return:
+message (jika error)
+schema ResponseProfilUMKM (jika berhasil)
+"""
+class EditProfilUMKM(BaseModel): # Request
+    id_akun: int
+    nama_pemilik: Optional[str] = None
+    email: Optional[str] = None
+    telp: Optional[str] = None
+    alamat_usaha: Optional[str] = None
+    username: Optional[str] = None
+    nama_umkm: Optional[str] = None
+    omzet: Optional[Decimal] = None
+    deskripsi_umkm: Optional[str] = None
+    jenis_usaha: Optional[str] = None
