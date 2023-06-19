@@ -22,9 +22,9 @@ import '../../shared_pref.dart';
 //   String? alamat;
 //   String? username;
 //   String? password;
-  
+
 //   ProfilPendanaModel();
-  
+
 //   void setProperties(
 //     String foto_profil,
 //     String nama_pendana,
@@ -55,6 +55,42 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   bool isEditMode = false;
   Uint8List? _selectedImage;
+  late TextEditingController nameController;
+  late TextEditingController emailController;
+  late TextEditingController phoneController;
+  late TextEditingController addressController;
+  late TextEditingController usernameController;
+  // late TextEditingController passwordController;
+
+  File? _image;
+
+  Future<void> _getImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    usernameController.dispose();
+    // passwordController.dispose();
+    super.dispose();
+  }
 
   //SharedPref
   int id_akun = 0;
@@ -69,9 +105,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
-  Future<void> fetchData() async {
+  Future<Map<String, String>> fetchData() async {
+    // Fetch data from API and return as a map
     final String apiUrl = 'http://127.0.0.1:8000/profil_pendana';
-    
     await _initIdAkun();
 
     final response = await http.post(
@@ -79,137 +115,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'id_akun': id_akun}),
     );
-
+    // Assuming the data fetched from the API is in the following format
+    final responseData = jsonDecode(response.body);
+    final Map<String, String> data = {
+      'nama_pendana': responseData['nama_pendana'] ?? '',
+      'email': responseData['email'] ?? '',
+      'telp': responseData['telp'] ?? '123',
+      'alamat': responseData['alamat'] ?? '',
+      'username': responseData['username'] ?? '',
+      // 'password': responseData['password'] ?? '',
+    };
     if (response.statusCode == 200) {
       // Fetch data successful, handle the response
-      final responseData = jsonDecode(response.body);
-      nameController.text = responseData['nama_pendana'] ?? '';
-      emailController.text = responseData['email'] ?? '';
-      phoneController.text = responseData['telp'] ?? '';
-      addressController.text = responseData['alamat'] ?? '';
-      usernameController.text = responseData['username'] ?? '';
-      passwordController.text = responseData['password'] ?? '';
     } else {
-      // Registration failed, show an error message
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Fetch Data Failed'),
-          content: Text('An error occurred during registration.'),
-          actions: [
-            TextButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      );
+      // Registration failed, throw an exception or return an empty map
+      throw Exception('An error occurred during registration.');
     }
-  }
-
-
-  // final ImagePickerWeb _imagePicker = ImagePickerWeb();
-  // final models = ActivityCubit();
-  // var futureProfil = ActivityCubit.fetchData();
-  late ActivityProfil futureProfil;
-  TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController addressController = TextEditingController();
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-  File? _image;
-
-  Future<void> _getImageFromGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage != null) {
-      // final imageFile = File(pickedImage.path);
-      // final appDir = await getApplicationDocumentsDirectory();
-      // final fileName = '${DateTime.now().millisecondsSinceEpoch}.png';
-      // final savedImage = await imageFile.copy('${appDir.path}/$fileName');
-
-      setState(() {
-        // _image = savedImage;
-        _image = File(pickedImage.path);
-        // _saveImage();
-        // _image
-      });
-    }
-  }
-
-  Future<void> _saveImage() async {
-    if (_image != null) {
-      try {
-        // Get the application documents directory
-
-        final directory = await getApplicationDocumentsDirectory();
-
-        // Generate a unique filename for the image
-        final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-        // final fileName = _image!.path;
-        final fileName = 'image_$timestamp.jpg';
-
-        // Check if the directory exists, create it if necessary
-        if (!(await directory.exists())) {
-          await directory.create(recursive: true);
-        }
-        // Create the destination file path
-        final destinationPath = '${directory.path}/$fileName';
-
-        // Copy the image file to the destination path
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(destinationPath)),
-        );
-        await _image!.copy(destinationPath);
-
-        // Show a success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image saved successfully!')),
-        );
-      } catch (e) {
-        // Show an error message if the image saving fails
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save image!')),
-        );
-        print(e);
-      }
-    } else {
-      // Show a message if no image is selected
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No image selected!')),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // _initIdAkun(); // dipanggil di fetchData()
-    // futureProfil = models.fetchData() as ActivityProfil;
-    // Initialize the text field values with previous data
-    nameController.text = 'User Name';
-    emailController.text = 'user@example.com';
-    phoneController.text = '+123456789';
-    addressController.text = '123 Street, City';
-    usernameController.text = 'user123';
-    // passwordController.text = '********';
-
-    fetchData();
-  }
-
-  @override
-  void dispose() {
-    // Dispose the text editing controllers
-    nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    addressController.dispose();
-    usernameController.dispose();
-    // passwordController.dispose();
-    super.dispose();
+    return data;
   }
 
   @override
@@ -230,7 +152,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               setState(() {
                 isEditMode = !isEditMode;
               });
-              // Perform the necessary actions for edit or save
             },
           ),
           if (isEditMode)
@@ -239,13 +160,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
               onPressed: () {
                 setState(() {
                   isEditMode = false;
-                  // Reset the form fields with previous values
-                  nameController.text = 'User Name';
-                  emailController.text = 'user@example.com';
-                  phoneController.text = '+123456789';
-                  addressController.text = '123 Street, City';
-                  usernameController.text = 'user123';
-                  // passwordController.text = '********';
+                  fetchData().then((responseData) {
+                    nameController.text = responseData['nama_pendana'] ?? '';
+                    emailController.text = responseData['email'] ?? '';
+                    phoneController.text = responseData['telp'] ?? '';
+                    addressController.text = responseData['alamat'] ?? '';
+                    usernameController.text = responseData['username'] ?? '';
+                    // passwordController.text = responseData['password'] ?? '';
+                  });
                   _image = null;
                 });
               },
@@ -269,8 +191,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: _image == null
                     ? Icon(Icons.person)
                     : ClipOval(
-                        child: Image.network(
-                          _image!.path,
+                        child: Image.file(
+                          _image!,
                           width: 150,
                           height: 150,
                           fit: BoxFit.cover,
@@ -285,23 +207,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: const Text('Select Image'),
                   )
                 : const SizedBox(height: 0),
-            // ElevatedButton(onPressed: _saveImage, child: const Text('Save')),
-            // const SizedBox(height: 20),
-            // GestureDetector(
-            //   onTap: () {},
-            //   child: Container(
-            //     decoration: BoxDecoration(
-            //       shape: BoxShape.circle,
-            //       border: Border.all(color: Theme.of(context).primaryColor),
-            //     ),
-            //     // child: CircleAvatar(
-            //     //   radius: 80,
-            //     //   backgroundImage: _selectedImage != null
-            //     //       ? MemoryImage(_selectedImage!)
-            //     //       : const NetworkImage('https://placehold.co/400x400.png'),
-            //     // ),
-            //   ),
-            // ),
             const SizedBox(height: 10),
             isEditMode
                 ? Padding(
@@ -313,10 +218,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       textAlign: TextAlign.center,
                     ),
                   )
-                : Text(
-                    nameController.text,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                : FutureBuilder<Map<String, String>>(
+                    future: fetchData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final responseData = snapshot.data!;
+                        nameController = TextEditingController(
+                          text: responseData['nama_pendana'] ?? '',
+                        );
+                        return Text(
+                          nameController.text,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
                   ),
             const SizedBox(height: 20),
             Card(
@@ -330,7 +250,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ? TextField(
                             controller: emailController,
                           )
-                        : Text(emailController.text),
+                        : FutureBuilder<Map<String, String>>(
+                            future: fetchData(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final responseData = snapshot.data!;
+                                emailController = TextEditingController(
+                                  text: responseData['email'] ?? '',
+                                );
+
+                                return Text(emailController.text);
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            },
+                          ),
                   ),
                   const Divider(),
                   ListTile(
@@ -340,7 +276,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ? TextField(
                             controller: phoneController,
                           )
-                        : Text(phoneController.text),
+                        : FutureBuilder<Map<String, String>>(
+                            future: fetchData(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final responseData = snapshot.data!;
+                                phoneController = TextEditingController(
+                                  text: responseData['telp'] ?? '',
+                                );
+
+                                return Text(phoneController.text);
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            },
+                          ),
                   ),
                   const Divider(),
                   ListTile(
@@ -350,7 +302,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ? TextField(
                             controller: addressController,
                           )
-                        : Text(addressController.text),
+                        : FutureBuilder<Map<String, String>>(
+                            future: fetchData(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final responseData = snapshot.data!;
+                                addressController = TextEditingController(
+                                  text: responseData['alamat'] ?? '',
+                                );
+
+                                return Text(addressController.text);
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            },
+                          ),
                   ),
                   const Divider(),
                   ListTile(
@@ -360,9 +328,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ? TextField(
                             controller: usernameController,
                           )
-                        : Text(usernameController.text),
+                        : FutureBuilder<Map<String, String>>(
+                            future: fetchData(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final responseData = snapshot.data!;
+                                usernameController = TextEditingController(
+                                  text: responseData['username'] ?? '',
+                                );
+
+                                return Text(usernameController.text);
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            },
+                          ),
                   ),
-                  // const Divider(),
+                  const Divider(),
                   // ListTile(
                   //   leading: const Icon(Icons.lock),
                   //   title: const Text('Password'),
@@ -370,7 +354,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   //       ? TextField(
                   //           controller: passwordController,
                   //         )
-                  //       : Text(passwordController.text),
+                  //       : FutureBuilder<Map<String, String>>(
+                  //           future: fetchData(),
+                  //           builder: (context, snapshot) {
+                  //             if (snapshot.hasData) {
+                  //               final responseData = snapshot.data!;
+                  //               passwordController = TextEditingController(
+                  //                 text: responseData['password'] ?? '',
+                  //               );
+
+                  //               return Text(passwordController.text);
+                  //             } else if (snapshot.hasError) {
+                  //               return Text('Error: ${snapshot.error}');
+                  //             } else {
+                  //               return CircularProgressIndicator();
+                  //             }
+                  //           },
+                  //         ),
                   // ),
                 ],
               ),
