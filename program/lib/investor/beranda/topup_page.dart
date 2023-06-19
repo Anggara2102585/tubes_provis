@@ -31,32 +31,32 @@ class TopUpPage extends StatefulWidget {
 
 class _TopUpPageState extends State<TopUpPage> {
   int _selectedIndex = 0;
-  late int id_akun;
+  // late int id_akun;
 
   @override
   void initState() {
     super.initState();
-    _getId();
+    // _getId();
   }
 
-  void _getId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      id_akun = prefs.getInt('id_akun') ?? 0;
-    });
-    if (id_akun == 0) {
-      _goToLoginPage();
-    }
-  }
+  // void _getId() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     id_akun = prefs.getInt('id_akun') ?? 0;
+  //   });
+  //   if (id_akun == 0) {
+  //     _goToLoginPage();
+  //   }
+  // }
 
-  void _goToLoginPage() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/',
-      (route) =>
-          false, // use (route) => false to remove all existing routes, effectively clearing the stack
-    );
-  }
+  // void _goToLoginPage() {
+  //   Navigator.pushNamedAndRemoveUntil(
+  //     context,
+  //     '/',
+  //     (route) =>
+  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
+  //   );
+  // }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -143,7 +143,7 @@ class _TopUpPageState extends State<TopUpPage> {
         child: Scaffold(
           appBar: AppBar(
             title: Text(
-              'Top Up $id_akun',
+              'Top Up id_akun', // disini tambahin var id akun
               style: titleTextStyle,
             ),
             backgroundColor: Colors.green,

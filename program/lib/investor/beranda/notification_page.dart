@@ -13,27 +13,27 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void initState() {
     super.initState();
-    _getId();
+    // _getId();
   }
 
-  void _getId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      id_akun = prefs.getInt('id_akun') ?? 0;
-    });
-    if (id_akun == 0) {
-      _goToLoginPage();
-    }
-  }
+  // void _getId() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     id_akun = prefs.getInt('id_akun') ?? 0;
+  //   });
+  //   if (id_akun == 0) {
+  //     _goToLoginPage();
+  //   }
+  // }
 
-  void _goToLoginPage() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/',
-      (route) =>
-          false, // use (route) => false to remove all existing routes, effectively clearing the stack
-    );
-  }
+  // void _goToLoginPage() {
+  //   Navigator.pushNamedAndRemoveUntil(
+  //     context,
+  //     '/',
+  //     (route) =>
+  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
+  //   );
+  // }
 
   final List<NotificationItem> notifications = [
     NotificationItem(
