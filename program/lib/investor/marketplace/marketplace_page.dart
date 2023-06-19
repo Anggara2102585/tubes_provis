@@ -22,7 +22,8 @@ class MarketplacePage extends StatelessWidget {
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      return responseData['data'];
+      final data = responseData['pendanaan'] as List<dynamic>;
+      return data;
     } else {
       throw Exception('Failed to fetch data from the API');
     }
@@ -46,11 +47,11 @@ class MarketplacePage extends StatelessWidget {
                 return Column(
                   children: data.map((item) {
                     final String namaUmkm = item['nama_umkm'];
-                    final int persenProgres = item['peersen_progres'];
+                    final int persenProgres = item['persen_progres'];
                     final double totalPendanaan = item['total_pendanaan'];
                     final String dlPenggalanganDana =
                         item['dl_penggalangan_dana'];
-                    final int kodePendanaan = item['kode_pendanaan'];
+                    final String kodePendanaan = item['kode_pendanaan'];
                     final int imbaHasil = item['imba_hasil'];
 
                     return GestureDetector(
@@ -59,7 +60,7 @@ class MarketplacePage extends StatelessWidget {
                       },
                       child: UMKMCard(
                         nama_umkm: namaUmkm,
-                        peersen_progres: persenProgres,
+                        persen_progres: persenProgres,
                         total_pendanaan: totalPendanaan,
                         dl_penggalangan_dana: dlPenggalanganDana,
                         kode_pendanaan: kodePendanaan,
@@ -123,15 +124,15 @@ class MarketplacePage extends StatelessWidget {
 
 class UMKMCard extends StatelessWidget {
   final String nama_umkm;
-  final int peersen_progres;
+  final int persen_progres;
   final double total_pendanaan;
   final String dl_penggalangan_dana;
-  final int kode_pendanaan;
+  final String kode_pendanaan;
   final int imba_hasil;
 
   UMKMCard({
     required this.nama_umkm,
-    required this.peersen_progres,
+    required this.persen_progres,
     required this.total_pendanaan,
     required this.dl_penggalangan_dana,
     required this.kode_pendanaan,
@@ -232,46 +233,48 @@ class UMKMCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      children: [
-                        Text(
-                          'Progress:',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        children: [
+                          Text(
+                            'Progress:',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 10.0),
-                        Text(
-                          '$peersen_progres%',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
+                          SizedBox(width: 10.0),
+                          Text(
+                            '$persen_progres%',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                        ],
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Jumlah Pinjaman: ${formatCurrency(total_pendanaan)}',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      'Jumlah Pinjaman: ${formatCurrency(total_pendanaan)}',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      'Tanggal: $dl_penggalangan_dana',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Tanggal: ${dl_penggalangan_dana.split("T")[0]}',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 SizedBox(width: 16.0),
               ],
