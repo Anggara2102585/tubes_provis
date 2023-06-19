@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:html' as html;
 import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 // import 'package:image_crop/image_crop.dart' as crop;
 // import 'package:image_picker_web/image_picker_web.dart';
@@ -12,6 +13,37 @@ import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared_pref.dart';
+
+// class ProfilPendanaModel {
+//   String? foto_profil;
+//   String? nama_pendana;
+//   String? email;
+//   String? telp;
+//   String? alamat;
+//   String? username;
+//   String? password;
+  
+//   ProfilPendanaModel();
+  
+//   void setProperties(
+//     String foto_profil,
+//     String nama_pendana,
+//     String email,
+//     String telp,
+//     String alamat,
+//     String username,
+//     String password
+//   )
+//   {
+//     this.foto_profil = foto_profil;
+//     this.nama_pendana = nama_pendana;
+//     this.email = email;
+//     this.telp = telp;
+//     this.alamat = alamat;
+//     this.username = username;
+//     this.password = password;
+//   }
+// }
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -36,6 +68,45 @@ class _EditProfilePageState extends State<EditProfilePage> {
       jenis_user = sharedPrefs.jenis_user;
     });
   }
+
+  Future<void> fetchData() async {
+    final String apiUrl = 'http://127.0.0.1:8000/profil_pendana';
+    
+    await _initIdAkun();
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id_akun': id_akun}),
+    );
+
+    if (response.statusCode == 200) {
+      // Fetch data successful, handle the response
+      final responseData = jsonDecode(response.body);
+      nameController.text = responseData['nama_pendana'] ?? '';
+      emailController.text = responseData['email'] ?? '';
+      phoneController.text = responseData['telp'] ?? '';
+      addressController.text = responseData['alamat'] ?? '';
+      usernameController.text = responseData['username'] ?? '';
+      passwordController.text = responseData['password'] ?? '';
+    } else {
+      // Registration failed, show an error message
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Fetch Data Failed'),
+          content: Text('An error occurred during registration.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
 
   // final ImagePickerWeb _imagePicker = ImagePickerWeb();
   // final models = ActivityCubit();
@@ -116,7 +187,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _initIdAkun();
+    // _initIdAkun(); // dipanggil di fetchData()
     // futureProfil = models.fetchData() as ActivityProfil;
     // Initialize the text field values with previous data
     nameController.text = 'User Name';
@@ -125,6 +196,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     addressController.text = '123 Street, City';
     usernameController.text = 'user123';
     // passwordController.text = '********';
+
+    fetchData();
   }
 
   @override
