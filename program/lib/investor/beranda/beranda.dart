@@ -15,27 +15,27 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _getId();
   }
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
 
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     children: <Widget>[
                       CircleAvatar(
-                        // backgroundImage: AssetImage('profile_pic.jpeg'),
+                        backgroundImage: AssetImage('assets/profile_pic.jpg'),
                         radius: 40,
                       ),
                       SizedBox(width: 24.0),
@@ -93,8 +93,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            // '$id_akun',
-                            'id_akun',
+                            '$id_akun',
                             style: bodyTextStyle,
                           ),
                         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../assets/font.dart';
+
+void main() => runApp(MyApp());
 
 class UMKM {
   final String logo;
@@ -33,16 +34,13 @@ class Pendanaan {
   });
 }
 
-class DetailMarketplacePage extends StatefulWidget {
-  const DetailMarketplacePage({super.key});
-
+class MyApp extends StatefulWidget {
   @override
-  DetailMarketplacePageState createState() => DetailMarketplacePageState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class DetailMarketplacePageState extends State<DetailMarketplacePage> {
-  int _selectedIndex = 0; // Set default selected index to 2 (Portofolio)
-
+class _MyAppState extends State<MyApp> {
+  int _selectedIndex = 0;
   TextEditingController searchController = TextEditingController();
   List<UMKM> filteredUMKM = [];
 
@@ -50,20 +48,6 @@ class DetailMarketplacePageState extends State<DetailMarketplacePage> {
     setState(() {
       _selectedIndex = index;
     });
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.pushNamed(context, '/beranda');
-        break;
-      case 1:
-        Navigator.pushNamed(context, '/marketplace');
-        break;
-      case 2:
-        Navigator.pushNamed(context, '/portofolio');
-        break;
-      case 3:
-        Navigator.pushNamed(context, '/profil');
-        break;
-    }
   }
 
   final List<UMKM> daftarUMKM = [
@@ -116,20 +100,10 @@ class DetailMarketplacePageState extends State<DetailMarketplacePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'UMKM Cards',
-      theme: ThemeData(primarySwatch: Colors.green),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
-          title: Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              Text('Detail'),
-            ],
-          ),
+          title: Text('UMKM Cards'),
         ),
         body: Column(
           children: [
@@ -190,7 +164,6 @@ class DetailMarketplacePageState extends State<DetailMarketplacePage> {
           currentIndex: 1, // Set the current index to 1 (Marketplace)
           selectedItemColor: Colors.green,
           unselectedItemColor: Colors.green[100],
-          onTap: _onItemTapped,
         ),
       ),
     );
@@ -227,7 +200,7 @@ class CardWidget extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: Colors.green,
+                    color: Colors.blue,
                     borderRadius: BorderRadius.circular(4.0),
                   ),
                   child: Text(

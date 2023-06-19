@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'notification_page.dart';
 import 'topup_page.dart';
 import 'withdraw_page.dart';
-import '../usahaku/usahaku.dart';
+import '../usahaku/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -40,32 +40,32 @@ class HomePageUMKM extends StatefulWidget {
 
 class _HomePageState extends State<HomePageUMKM> {
   int _selectedIndex = 0;
-  // late int id_akun;
+  late int id_akun;
 
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _getId();
   }
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
 
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePageUMKM> {
         Navigator.pushNamed(context, '/usahaku');
         break;
       case 2:
-        Navigator.pushNamed(context, '/profilUmkm');
+        Navigator.pushNamed(context, '/profil');
         break;
     }
   }
@@ -103,7 +103,7 @@ class _HomePageState extends State<HomePageUMKM> {
                   Row(
                     children: <Widget>[
                       CircleAvatar(
-                        // backgroundImage: AssetImage('profile_pic.jpeg'),
+                        backgroundImage: AssetImage('assets/profile_pic.jpg'),
                         radius: 40,
                       ),
                       SizedBox(width: 16.0),
@@ -111,8 +111,7 @@ class _HomePageState extends State<HomePageUMKM> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'User Id',
-                            // '$id_akun',
+                            '$id_akun',
                             style: TextStyle(fontSize: 20.0),
                           ),
                         ],

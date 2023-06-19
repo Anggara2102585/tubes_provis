@@ -19,26 +19,26 @@ class EditProfileUmkmPage extends StatefulWidget {
 class _EditProfilState extends State<EditProfileUmkmPage> {
   bool isEditMode = false;
 
-  // late int id_akun;
+  late int id_akun;
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
 
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   // late ActivityCubit future
   TextEditingController umkmNameController = TextEditingController();
@@ -51,7 +51,7 @@ class _EditProfilState extends State<EditProfileUmkmPage> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController userusernameController = TextEditingController();
-  // TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   File? _image;
 
@@ -77,7 +77,7 @@ class _EditProfilState extends State<EditProfileUmkmPage> {
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _getId();
     umkmNameController.text = "My Business";
     ownerController.text = "Owner Name";
     omsetController.text = '9.000.000';
@@ -89,7 +89,7 @@ class _EditProfilState extends State<EditProfileUmkmPage> {
     phoneController.text = '+123456789';
     addressController.text = '123 Street, City';
     userusernameController.text = 'user123';
-    // passwordController.text = '********';
+    passwordController.text = '********';
   }
 
   @override
@@ -105,7 +105,7 @@ class _EditProfilState extends State<EditProfileUmkmPage> {
     phoneController.dispose();
     addressController.dispose();
     userusernameController.dispose();
-    // passwordController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -148,7 +148,7 @@ class _EditProfilState extends State<EditProfileUmkmPage> {
                   phoneController.text = '+123456789';
                   addressController.text = '123 Street, City';
                   userusernameController.text = 'user123';
-                  // passwordController.text = '********';
+                  passwordController.text = '********';
                   _image = null;
                 });
               },
@@ -289,15 +289,15 @@ class _EditProfilState extends State<EditProfileUmkmPage> {
                         : Text(userusernameController.text),
                   ),
                   const Divider(),
-                  // ListTile(
-                  //   leading: const Icon(Icons.lock),
-                  //   title: const Text('Password'),
-                  //   subtitle: isEditMode
-                  //       ? TextField(
-                  //           controller: passwordController,
-                  //         )
-                  //       : Text(passwordController.text),
-                  // ),
+                  ListTile(
+                    leading: const Icon(Icons.lock),
+                    title: const Text('Password'),
+                    subtitle: isEditMode
+                        ? TextField(
+                            controller: passwordController,
+                          )
+                        : Text(passwordController.text),
+                  ),
                 ],
               ),
             ),

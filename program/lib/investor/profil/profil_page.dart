@@ -13,32 +13,32 @@ class ProfilPage extends StatefulWidget {
 class ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
   var f = ActivityCubit();
-  // late int id_akun;
+  late int id_akun;
 
   @override
   void initState() {
     super.initState();
-    // _getId();
+    _getId();
   }
 
-  // void _getId() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     id_akun = prefs.getInt('id_akun') ?? 0;
-  //   });
-  //   if (id_akun == 0) {
-  //     _goToLoginPage();
-  //   }
-  // }
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
 
-  // void _goToLoginPage() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //     context,
-  //     '/',
-  //     (route) =>
-  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
-  //   );
-  // }
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -151,7 +151,6 @@ class _ProfilPageContent extends StatelessWidget {
             ),
             trailing: const Icon(Icons.exit_to_app, color: Colors.red),
             onTap: () {
-              // hapusDataUser();
               // Handle 'Keluar' button tap
               // Perform logout action
             },
