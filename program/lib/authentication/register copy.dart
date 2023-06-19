@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import '../../assets/font.dart';
 
 import 'dart:io';
 import 'dart:async';
@@ -59,6 +60,8 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController confirmPasswordController = TextEditingController();
   String? ktpPath;
   String? selfiePath;
+  TextEditingController umkmNameController = TextEditingController();
+  TextEditingController omzetController = TextEditingController();
   TextEditingController businessTypeController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -66,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
   UserRole? selectedRole;
   String? selectedProvince;
   String? selectedCity;
-  
+
   Future<void> registerPendana() async {
     final String apiUrl = 'http://127.0.0.1:8000/register/pendana';
 
@@ -109,6 +112,61 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  Future<void> registerUMKM() async {
+    final String apiUrl = 'http://127.0.0.1:8000/register/umkm';
+
+    int omzet = 0;
+    try {
+      omzet = int.parse(omzetController.text);
+    } catch (e) {
+      print('Failed to parse omzet: $e');
+    }
+
+  final response = await http.post(
+    Uri.parse(apiUrl),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'nama': nameController.text,
+      'username': usernameController.text,
+      'password': passwordController.text,
+      'foto_ktp': ktpController.text,
+      'foto_selfie': selfieController.text,
+      'nama_umkm': umkmNameController.text,
+      'jenis_usaha': businessTypeController.text,
+      'deskripsi_umkm': descriptionController.text,
+      'telp': phoneController.text,
+      'alamat_usaha': addressController.text,
+      'omzet': omzet,
+    }),
+  );
+
+    if (response.statusCode == 200) {
+      // Registration successful, handle the response
+      // var responseData = jsonDecode(response.body);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/',
+        (route) => false,
+      );
+      // Handle the response data as needed
+    } else {
+      // Registration failed, show an error message
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Registration Failed'),
+          content: Text('An error occurred during registration.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     nameController.dispose();
@@ -121,6 +179,8 @@ class _RegisterPageState extends State<RegisterPage> {
     addressController.dispose();
     phoneController.dispose();
     descriptionController.dispose();
+    umkmNameController.dispose();
+    omzetController.dispose();
     super.dispose();
   }
 
@@ -198,6 +258,20 @@ class _RegisterPageState extends State<RegisterPage> {
     return null;
   }
 
+  String? validateUmkmName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Nama UMKM tidak boleh kosong';
+    }
+    return null;
+  }
+
+  String? validateOmzet(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Omzet tidak boleh kosong';
+    }
+    return null;
+  }
+
   Future<void> selectKtp() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -206,7 +280,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (result != null) {
       setState(() {
         ktpPath = result.files.first.path!;
-        ktpPath = 'result.files.first.path!'; // remove this after filepicker is fixed
+        ktpPath =
+            'result.files.first.path!'; // remove this after filepicker is fixed
         ktpController.text = ktpPath!;
       });
     }
@@ -220,7 +295,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (result != null) {
       setState(() {
         selfiePath = result.files.first.path!;
-        selfiePath = 'result.files.first.path!'; // remove this after filepicker is fixed
+        selfiePath =
+            'result.files.first.path!'; // remove this after filepicker is fixed
         selfieController.text = selfiePath!;
       });
     }
@@ -375,6 +451,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                 Text('Isi formulir tambahan untuk Peminjam'),
                                 SizedBox(height: 16.0),
                                 TextFormField(
+                                  controller: umkmNameController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nama UMKM',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                  ),
+                                  validator: validateUmkmName,
+                                ),
+                                SizedBox(height: 16.0),
+                                TextFormField(
                                   controller: businessTypeController,
                                   decoration: InputDecoration(
                                     labelText: 'Jenis Usaha',
@@ -383,17 +470,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                   ),
                                   validator: validateBusinessType,
-                                ),
-                                SizedBox(height: 16.0),
-                                TextFormField(
-                                  controller: phoneController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Nomor Telepon',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                    ),
-                                  ),
-                                  validator: validatePhone,
                                 ),
                                 SizedBox(height: 16.0),
                                 TextFormField(
@@ -417,6 +493,49 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                   validator: validateAddress,
                                 ),
+                                SizedBox(height: 16.0),
+                                TextFormField(
+                                  controller: phoneController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nomor Telepon',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                  ),
+                                  validator: validatePhone,
+                                ),
+                                SizedBox(height: 16.0),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Omzet',
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text(
+                                        'Rp',
+                                        style: bodyTextStyle,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: omzetController,
+                                        style: bodyTextStyle,
+                                        decoration: InputDecoration(
+                                          hintText: '0',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5.0),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 16),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                             actions: [
@@ -438,6 +557,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     // if (photoPath != null) {
                                     //   photoController.text = photoPath!;
                                     // }
+                                    registerUMKM();
                                     Navigator.pushNamed(context, '/');
                                   }
                                 },
