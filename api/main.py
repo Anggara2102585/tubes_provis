@@ -402,7 +402,7 @@ def get_pendanaan_marketplace(db: Session = Depends(get_db)):
 
         pendanaan_data = schemas.CardMarketplace(
             nama_umkm=item.umkm.nama_umkm,
-            jenis_umkm=item.umkm.jenis_umkm,
+            jenis_usaha=item.umkm.jenis_usaha,
             kode_pendanaan=item.kode_pendanaan,
             total_pendanaan=item.total_pendanaan,
             dana_masuk=item.dana_masuk,

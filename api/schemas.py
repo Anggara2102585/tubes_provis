@@ -112,11 +112,11 @@ class ListMarketplace(BaseModel): # Request
     # jenis_umkm: Optional[str]
 class CardMarketplace(BaseModel): # Response
     nama_umkm: str
-    jenis_umkm: str
+    jenis_usaha: str
     kode_pendanaan: str
     total_pendanaan: Decimal
     dana_masuk: Decimal
-    peersen_progres: int = Field(ge=0, le=100)
+    persen_progres: int = Field(ge=0, le=100)
     imba_hasil: int = Field(ge=0, le=100)
     dl_penggalangan_dana: datetime
 class ResponseListMarketplace(BaseModel):
