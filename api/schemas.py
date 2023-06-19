@@ -79,9 +79,11 @@ class TopUp(BaseModel): # Request
 """ return:
 saldo
 """
-class GetSaldo(BaseModel):
+class GetSaldo(BaseModel): # Request
     id_akun: int
     jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
+class Saldo(BaseModel): # Response
+    saldo: Decimal
 """
 (ngurangin saldo + notifikasi)
 return: message [gagal/berhasil]

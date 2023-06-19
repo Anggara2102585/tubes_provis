@@ -180,7 +180,7 @@ def login(login_request: schemas.Login, db: Session = Depends(get_db)):
 Pendana
 """
 
-@app.post("/pendana/beranda") # Using post because we are not just fetching data but also performing calculations and aggregations based on the provided data.
+@app.post("/pendana/beranda", response_model=schemas.ResponseBerandaPendana) # Using post because we are not just fetching data but also performing calculations and aggregations based on the provided data.
 def get_pendana_homepage(pendana_request: schemas.BerandaPendana, db: Session = Depends(get_db)):
     # Retrieve the Pendana data
     pendana = db.query(models.Pendana).filter(models.Pendana.id_akun == pendana_request.id_akun).first()
@@ -232,7 +232,7 @@ def get_pendana_homepage(pendana_request: schemas.BerandaPendana, db: Session = 
 
     return response
 
-@app.post("/notifikasi")
+@app.post("/notifikasi", response_model=schemas.ResponseListNotifikasi)
 def get_and_read_notifications(notifikasi_request: schemas.ListNotifikasi, db: Session = Depends(get_db)):
     # Process based on the user type
     if notifikasi_request.jenis_user == 1:
@@ -333,8 +333,10 @@ def get_saldo(get_saldo_request: schemas.GetSaldo, db: Session = Depends(get_db)
     dompet = db.query(models.Dompet).get(id_dompet)
     if not dompet:
         raise HTTPException(status_code=404, detail="Dompet not found")
+    
+    response = schemas.Saldo(saldo=dompet.saldo)
 
-    return {"saldo": dompet.saldo}
+    return response
 
 @app.post("/tarik-dana")
 def process_withdraw(withdraw_request: schemas.TarikDana, db: Session = Depends(get_db)):
