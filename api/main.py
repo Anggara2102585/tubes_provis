@@ -1,10 +1,12 @@
 import copy
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+from sqlalchemy import func, exc
+from sqlalchemy.orm import Session, joinedload
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from passlib.context import CryptContext
 
 import schemas, models
 from database import SessionLocal, engine
@@ -22,6 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# Create a password context for password hashing and verification
+password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -29,6 +35,29 @@ def get_db():
         yield db
     finally:
         db.close()
+
+#upload image
+@app.post("/uploadimage")
+# pip install python-multipart
+# buat terlebih dulu direktori /data_file untuk menyimpan file
+def upload(file: UploadFile = File(...)):
+    try:
+        print("mulai upload")
+        print(file.filename)
+        contents = file.file.read()
+        with open("./data_file/"+file.filename, 'wb') as f:
+            f.write(contents)
+    except Exception:
+        return {"message": "Error upload file"}
+    finally:
+        file.file.close()
+
+    return {"message": f"Upload berhasil: {file.filename}"}
+
+# ambil image berdasarkan nama file
+@app.get("/getimage/{nama_file}")
+async def getImage(nama_file:str):
+    return FileResponse("./data_file/"+nama_file)
 
 """ 
 LOGIN & REGISTER
@@ -47,10 +76,13 @@ def register_pendana(pendana_request: schemas.RegisterPendanaRequest, db: Sessio
     db.commit()
     db.refresh(new_dompet)
 
+    # Hash the new password
+    hashed_password = password_context.hash(pendana_request.password)
+
     # Create a new Akun for the pendana
     new_akun = models.Akun(
         username = pendana_request.username,
-        password = pendana_request.password,
+        password = hashed_password,
         foto_ktp = pendana_request.foto_ktp,
         foto_selfie = pendana_request.foto_selfie,
         jenis_user = 2
@@ -89,10 +121,13 @@ def register_umkm(umkm_request: schemas.RegisterUMKMRequest, db: Session = Depen
     db.commit()
     db.refresh(new_dompet)
 
+    # Hash the new password
+    hashed_password = password_context.hash(umkm_request.password)
+
     # Create a new Akun for the umkm
     new_akun = models.Akun(
         username = umkm_request.username,
-        password = umkm_request.password,
+        password = hashed_password,
         foto_ktp = umkm_request.foto_ktp,
         foto_selfie = umkm_request.foto_selfie,
         jenis_user = 1
@@ -125,9 +160,13 @@ def register_umkm(umkm_request: schemas.RegisterUMKMRequest, db: Session = Depen
 
 @app.post("/login")
 def login(login_request: schemas.Login, db: Session = Depends(get_db)):
-    # Check if the username and password match an existing account
-    akun = db.query(models.Akun).filter(models.Akun.username == login_request.username, models.Akun.password == login_request.password).first()
+    # Check if the username
+    akun = db.query(models.Akun).filter(models.Akun.username == login_request.username).first()
     if not akun:
+        raise HTTPException(status_code=401, detail="Username atau password salah")
+
+    # Verify the password
+    if not password_context.verify(login_request.password, akun.password):
         raise HTTPException(status_code=401, detail="Username atau password salah")
 
     # Return the id_akun and jenis_user in the response
@@ -169,7 +208,7 @@ def get_pendana_homepage(pendana_request: schemas.BerandaPendana, db: Session = 
         total_bagi_hasil = 0
 
     # Retrieve the UMKM data
-    umkm_records = db.query(models.Umkm.nama_umkm, (models.PendanaanPendana.jumlah_danai + models.PendanaanPendana.jumlah_danai * models.Pendanaan.imba_hasil).label('sisa_pokok')).\
+    umkm_records = db.query(models.Umkm.nama_umkm, (models.PendanaanPendana.jumlah_danai + models.PendanaanPendana.jumlah_danai * models.Pendanaan.imba_hasil / 100).label('sisa_pokok')).\
         join(models.Pendanaan, models.PendanaanPendana.id_pendanaan == models.Pendanaan.id_pendanaan).\
         filter(models.PendanaanPendana.id_pendana == pendana.id_pendana).\
         filter(models.Pendanaan.status_pendanaan.in_([1, 2, 3])).\
@@ -345,3 +384,325 @@ def process_withdraw(withdraw_request: schemas.TarikDana, db: Session = Depends(
     db.commit()
 
     return {"message": "Penarikan dana berhasil"}
+
+@app.get("/marketplace", response_model=schemas.ResponseListMarketplace)
+def get_pendanaan_marketplace(db: Session = Depends(get_db)):
+    # Retrieve the available pendanaan from the database
+    pendanaan = db.query(models.Pendanaan). \
+        options(joinedload(models.Pendanaan.umkm)). \
+        filter(models.Pendanaan.status_pendanaan == 1). \
+        all()
+
+    # Prepare the response data
+    marketplace_data = []
+    for item in pendanaan:
+        persen_progres = (item.dana_masuk / item.total_pendanaan) * 100
+
+        pendanaan_data = schemas.CardMarketplace(
+            nama_umkm=item.umkm.nama_umkm,
+            jenis_umkm=item.umkm.jenis_umkm,
+            kode_pendanaan=item.kode_pendanaan,
+            total_pendanaan=item.total_pendanaan,
+            dana_masuk=item.dana_masuk,
+            imba_hasil=item.imba_hasil,
+            dl_penggalangan_dana=item.dl_penggalangan_dana,
+            persen_progres=persen_progres
+        )
+        marketplace_data.append(pendanaan_data)
+
+    response = schemas.ResponseListMarketplace(pendanaan=marketplace_data)
+    return response
+
+@app.post("/portofolio", response_model=schemas.ResponseListPortofolio)
+def get_portofolio(portofolio_request: schemas.ListPortofolio, db: Session = Depends(get_db)):
+    # Retrieve the corresponding pendana based on id_akun
+    pendana = db.query(models.Pendana).filter(models.Pendana.id_akun == portofolio_request.id_akun).first()
+    if not pendana:
+        raise HTTPException(status_code=404, detail="Pendana not found")
+    id_pendana = pendana.id_pendana
+
+    # Retrieve the portfolio data from the database
+    pendanaan = db.query(models.PendanaanPendana).\
+        join(models.Pendanaan, models.PendanaanPendana.id_pendanaan == models.Pendanaan.id_pendanaan).\
+        join(models.Umkm, models.Pendanaan.id_umkm == models.Umkm.id_umkm).\
+        filter(models.PendanaanPendana.id_pendana == id_pendana).\
+        all()
+
+    # Prepare the response data
+    portofolio_data = []
+    for item in pendanaan:
+        portofolio_item = schemas.CardPortofolio(
+            nama_umkm=item.umkm.nama_umkm,
+            kode_pendanaan=item.pendanaan.kode_pendanaan,
+            status_pendanaan=item.pendanaan.status_pendanaan,
+            jumlah_danai=item.jumlah_danai,
+            tanggal_danai=item.tanggal_danai
+        )
+        portofolio_data.append(portofolio_item)
+
+    response = schemas.ResponseListPortofolio(pendanaan=portofolio_data)
+    return response
+
+""" 
+asdf
+asdf
+adsf
+detail_pendanaan not tested
+ """
+@app.post("/detail_pendanaan", response_model=schemas.ResponseDetailPendanaan)
+def get_detail_pendanaan(detail_pendanaan_request: schemas.DetailPendanaan, db: Session = Depends(get_db)):
+    # Retrieve the corresponding pendana based on id_akun
+    pendana = db.query(models.Pendana).filter(models.Pendana.id_akun == detail_pendanaan_request.id_akun).first()
+    if not pendana:
+        raise HTTPException(status_code=404, detail="Pendana not found")
+    id_pendana = pendana.id_pendana
+
+    # Retrieve the portfolio data from the database
+    pendanaanPendana = db.query(models.PendanaanPendana).\
+        join(models.Pendanaan, models.PendanaanPendana.id_pendanaan == models.Pendanaan.id_pendanaan).\
+        join(models.Umkm, models.Pendanaan.id_umkm == models.Umkm.id_umkm).\
+        filter(models.PendanaanPendana.id_pendana == id_pendana).\
+        filter(models.PendanaanPendana.id_pendanaan == detail_pendanaan_request.id_pendanaan).\
+        first()
+    if not pendanaanPendana:
+        raise HTTPException(status_code=404, detail="Pendanaan not found")
+
+    # Prepare the response data
+    response = schemas.ResponseDetailPendanaan(
+        nama_pemilik=pendanaanPendana.umkm.nama_pemilik,
+        nama_umkm=pendanaanPendana.umkm.nama_umkm,
+        jenis_usaha=pendanaanPendana.umkm.jenis_usaha,
+        telp=pendanaanPendana.umkm.telp,
+        deskripsi_umkm=pendanaanPendana.umkm.deskripsi_umkm,
+        
+        kode_pendanaan=pendanaanPendana.pendanaan.kode_pendanaan,
+        pendanaan_ke=pendanaanPendana.pendanaan.pendanaan_ke,
+        status_pendanaan=pendanaanPendana.pendanaan.status_pendanaan,
+        total_pendanaan=pendanaanPendana.pendanaan.total_pendanaan,
+        dana_masuk=pendanaanPendana.pendanaan.dana_masuk,
+        persen_progres=pendanaanPendana.pendanaan.persen_progres,
+        imba_hasil=pendanaanPendana.pendanaan.imba_hasil,
+        minimal_pendanaan=pendanaanPendana.pendanaan.minimal_pendanaan,
+        dl_pendanaan_dana=pendanaanPendana.pendanaan.dl_pendanaan_dana,
+        dl_bagi_hasil=pendanaanPendana.pendanaan.dl_bagi_hasil,
+        deskripsi_pengajuan=pendanaanPendana.pendanaan.deskripsi_pengajuan,
+        tanggal_pengajuan=pendanaanPendana.pendanaan.tanggal_pengajuan,
+        tanggal_selesai=pendanaanPendana.pendanaan.tanggal_selesai,
+        
+        jumlah_danai=pendanaanPendana.jumlah_danai,
+        tanggal_danai=pendanaanPendana.tanggal_danai
+    )
+    if response.tanggal_selesai:
+        response.is_telat = pendanaanPendana.pendanaan.tanggal_selesai > pendanaanPendana.pendanaan.dl_bagi_hasil
+    response.bunga = pendanaanPendana.pendanaan.total_pendanaan * pendanaanPendana.pendanaan.imba_hasil/100
+    response.total_bagi_hasil =  pendanaanPendana.pendanaan.total_pendanaan + response.bunga
+
+    return response
+
+@app.post("/profil_pendana", response_model=schemas.ResponseProfilPendana)
+def get_profil_pendana(profil_pendana_request: schemas.ProfilPendana, db: Session = Depends(get_db)):
+    # Retrieve the corresponding pendana based on id_akun
+    pendana = db.query(models.Pendana).filter(models.Pendana.id_akun == profil_pendana_request.id_akun).first()
+    if not pendana:
+        raise HTTPException(status_code=404, detail="Pendana not found")
+
+    # Prepare the response data
+    response = schemas.ResponseProfilPendana(
+        foto_profil=pendana.foto_profil,
+        nama_pendana=pendana.nama_pendana,
+        email=pendana.email,
+        telp=pendana.telp,
+        alamat=pendana.alamat,
+        username=pendana.akun.username,
+        password=pendana.akun.password
+    )
+
+    return response
+
+@app.put("/edit_profil_pendana", response_model=schemas.ResponseProfilPendana)
+def edit_profil_pendana(edit_profil_request: schemas.EditProfilPendana, db: Session = Depends(get_db)):
+    # Retrieve the corresponding pendana based on id_akun
+    pendana = db.query(models.Pendana).filter(models.Pendana.id_akun == edit_profil_request.id_akun).first()
+    if not pendana:
+        raise HTTPException(status_code=404, detail="Pendana not found")
+
+    # Update the profile data
+    if edit_profil_request.foto_profil is not None:
+        pendana.foto_profil = edit_profil_request.foto_profil
+    if edit_profil_request.nama_pendana is not None:
+        pendana.nama_pendana = edit_profil_request.nama_pendana
+    if edit_profil_request.email is not None:
+        pendana.email = edit_profil_request.email
+    if edit_profil_request.telp is not None:
+        pendana.telp = edit_profil_request.telp
+    if edit_profil_request.alamat is not None:
+        pendana.alamat = edit_profil_request.alamat
+    if edit_profil_request.username is not None:
+        # Check if the new username is unique
+        if db.query(models.Akun).filter(models.Akun.username == edit_profil_request.username).first():
+            raise HTTPException(status_code=400, detail="Username already exists")
+        pendana.akun.username = edit_profil_request.username
+    if edit_profil_request.password is not None:
+        # Hash the new password
+        hashed_password = password_context.hash(edit_profil_request.password)
+        pendana.akun.password = hashed_password
+
+    try:
+        db.commit()
+        db.refresh(pendana)
+    except exc.SQLAlchemyError:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to update profile")
+
+    # Prepare the response data
+    response = schemas.ResponseProfilPendana(
+        foto_profil=pendana.foto_profil,
+        nama_pendana=pendana.nama_pendana,
+        email=pendana.email,
+        telp=pendana.telp,
+        alamat=pendana.alamat,
+        username=pendana.akun.username,
+        password=pendana.akun.password
+    )
+
+    return response
+
+@app.post("/usahaku", response_model=schemas.ResponseUsahaku)
+def get_usahaku(usahaku_request: schemas.Usahaku, db: Session = Depends(get_db)):
+    # Retrieve the corresponding UMKM based on id_akun
+    umkm = db.query(models.Umkm).filter(models.Umkm.id_akun == usahaku_request.id_akun).first()
+    if not umkm:
+        raise HTTPException(status_code=404, detail="UMKM not found")
+
+    # Retrieve total_pinjaman
+    total_pinjaman = db.query(func.sum(models.Pendanaan.total_pendanaan)).filter(models.Pendanaan.id_umkm == umkm.id_umkm).scalar() or 0
+
+    # Retrieve total_pengeluaran
+    total_pengeluaran = db.query(func.sum(models.Pendanaan.total_pendanaan + models.Pendanaan.total_pendanaan * models.Pendanaan.imba_hasil / 100)).filter(models.Pendanaan.id_umkm == umkm.id_umkm).scalar() or 0
+
+    # Retrieve the list of pendanaan
+    pendanaan_list = []
+    pendanaan_rows = db.query(models.Pendanaan).filter(models.Pendanaan.id_umkm == umkm.id_umkm).all()
+    for pendanaan in pendanaan_rows:
+        # Calculate persen_progres for each pendanaan
+        persen_progres = int(pendanaan.dana_masuk / pendanaan.total_pendanaan * 100) if pendanaan.dana_masuk != 0 else 0
+
+        # Calculate total_bayar for each pendanaan
+        total_bayar = pendanaan.total_pendanaan + pendanaan.total_pendanaan * pendanaan.imba_hasil / 100
+
+        pendanaan_data = schemas.PendanaanUsahaku(
+            kode_pendanaan=pendanaan.kode_pendanaan,
+            deskripsi_pendanaan=pendanaan.deskripsi_pendanaan,
+            status_pendanaan=pendanaan.status_pendanaan,
+            dana_masuk=pendanaan.dana_masuk,
+            dl_penggalangan_dana=pendanaan.dl_penggalangan_dana,
+            tanggal_pengajuan=pendanaan.tanggal_pengajuan,
+            tanggal_selesai=pendanaan.tanggal_selesai,
+            total_bayar=total_bayar,
+            persen_progres=persen_progres
+        )
+        pendanaan_list.append(pendanaan_data)
+
+    # Prepare the response data
+    response = schemas.ResponseUsahaku(
+        nama_umkm=umkm.nama_umkm,
+        jenis_usaha=umkm.jenis_usaha,
+        limit_pinjaman=umkm.limit_pinjaman,
+        total_pinjaman=total_pinjaman,
+        total_pengeluaran=total_pengeluaran,
+        pendanaan=pendanaan_list
+    )
+
+    return response
+""" 
+asdf
+asdf
+asdf
+asdf
+asdfasfd
+ """
+@app.post("/lihat_pendana", response_model=schemas.ResponseLihatPendana)
+def lihat_pendana(lihat_pendana_request: schemas.LihatPendana, db: Session = Depends(get_db)):
+    # Retrieve the corresponding pendanaan based on id_pendanaan
+    pendanaan = db.query(models.Pendanaan).filter(models.Pendanaan.id_pendanaan == lihat_pendana_request.id_pendanaan).first()
+    if not pendanaan:
+        raise HTTPException(status_code=404, detail="Pendanaan not found")
+
+    # Retrieve the list of pendana
+    pendana_list = []
+    pendana_rows = db.query(models.PendanaanPendana).filter(models.PendanaanPendana.id_pendanaan == pendanaan.id_pendanaan).all()
+    for pendana_row in pendana_rows:
+        # Retrieve nama_pendana from pendana table
+        pendana = db.query(models.Pendana).filter(models.Pendana.id_pendana == pendana_row.id_pendana).first()
+        if not pendana:
+            raise HTTPException(status_code=500, detail="Failed to retrieve pendana")
+
+        pendana_data = schemas.DataPendana(
+            nama_pendana=pendana.nama_pendana,
+            jumlah_danai=pendana_row.jumlah_danai,
+            tanggal_danai=pendana_row.tanggal_danai
+        )
+        pendana_list.append(pendana_data)
+
+    # Prepare the response data
+    response = schemas.ResponseLihatPendana(
+        pendana=pendana_list
+    )
+
+    return response
+
+@app.post("/mengajukan_pendanaan", response_model=schemas.ResponseMengajukanPendanaan)
+def mengajukan_pendanaan(mengajukan_pendanaan_request: schemas.MengajukanPendanaan, db: Session = Depends(get_db)):
+    # Retrieve the corresponding UMKM based on id_akun
+    umkm = db.query(models.Umkm).filter(models.Umkm.id_akun == mengajukan_pendanaan_request.id_akun).first()
+    if not umkm:
+        raise HTTPException(status_code=404, detail="UMKM not found")
+
+    # Calculate the pendanaan_ke
+    pendanaan_ke = db.query(func.count(models.Pendanaan.id_pendanaan)).filter(models.Pendanaan.id_umkm == umkm.id_umkm).scalar() or 0
+    pendanaan_ke += 1
+
+    # Generate the kode_pendanaan
+    kode_pendanaan = f"{umkm.nama_umkm}-{pendanaan_ke}"
+
+    # Prepare the pendanaan data
+    pendanaan_data = models.Pendanaan(
+        id_umkm=umkm.id_umkm,
+        pendanaan_ke=pendanaan_ke,
+        kode_pendanaan=kode_pendanaan,
+        status_pendanaan=1,
+        total_pendanaan=mengajukan_pendanaan_request.total_pendanaan,
+        dana_masuk=0,
+        imba_hasil=mengajukan_pendanaan_request.imba_hasil,
+        minimal_pendanaan=mengajukan_pendanaan_request.minimal_pendanaan,
+        dl_penggalangan_dana=datetime.now() + timedelta(days=mengajukan_pendanaan_request.dl_penggalangan_dana),
+        dl_bagi_hasil=datetime.now() + timedelta(days=mengajukan_pendanaan_request.dl_penggalangan_dana+30),
+        deskripsi_pendanaan=mengajukan_pendanaan_request.deskripsi_pendanaan,
+        tanggal_pengajuan=datetime.now(),
+        tanggal_selesai=None
+    )
+
+    # Save the pendanaan to the database
+    db.add(pendanaan_data)
+    db.commit()
+    db.refresh(pendanaan_data)
+
+    # Prepare the response data
+    response = schemas.ResponseMengajukanPendanaan(
+        id_pendanaan=pendanaan_data.id_pendanaan,
+        id_umkm=pendanaan_data.id_umkm,
+        pendanaan_ke=pendanaan_data.pendanaan_ke,
+        kode_pendanaan=pendanaan_data.kode_pendanaan,
+        status_pendanaan=pendanaan_data.status_pendanaan,
+        total_pendanaan=pendanaan_data.total_pendanaan,
+        dana_masuk=pendanaan_data.dana_masuk,
+        imba_hasil=pendanaan_data.imba_hasil,
+        minimal_pendanaan=pendanaan_data.minimal_pendanaan,
+        dl_penggalangan_dana=pendanaan_data.dl_penggalangan_dana,
+        dl_bagi_hasil=pendanaan_data.dl_bagi_hasil,
+        deskripsi_pendanaan=pendanaan_data.deskripsi_pendanaan,
+        tanggal_pengajuan=pendanaan_data.tanggal_pengajuan,
+        tanggal_selesai=pendanaan_data.tanggal_selesai
+    )
+
+    return response

@@ -62,7 +62,7 @@ class Pendanaan(Base):
     dana_masuk = Column(Numeric(precision=15,scale=2))
     imba_hasil = Column(Integer) # dalam persen
     minimal_pendanaan = Column(Numeric(precision=15,scale=2))
-    dl_penggalangan = Column(DateTime)
+    dl_penggalangan_dana = Column(DateTime)
     dl_bagi_hasil = Column(DateTime)
     deskripsi_pendanaan = Column(Text)
     tanggal_pengajuan = Column(DateTime)
@@ -100,7 +100,7 @@ class Pendana(Base):
     __tablename__ = "pendana"
 
     id_pendana = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    foto_profil = Column(String, unique=True)
+    foto_profil = Column(String)
     nama_pendana = Column(String)
     id_dompet = Column(Integer, ForeignKey("dompet.id_dompet"))
     id_akun = Column(Integer, ForeignKey("akun.id_akun"))

@@ -96,24 +96,29 @@ class TarikDana(BaseModel):
 
 # Marketplace
 
-# Minta list UMKM
+# Minta list Pendanaan
 # - ngasih yang statusnya 1
-# - urut berdasarkan yang dl_penggalangan_dana paling awal
+# - urut berdasarkan yang dl_penggalangan_dana paling awal (gak jadi)
 """ 
-return: list UMKM
-tiap UMKM:
-- nama_umkm
-- jenis_umkm
-- kode_pendanaan
-- total_pendanaan
-- dana_masuk
-- persen_progres
-- imba_hasil
-- dl_penggalangan_dana
+return: list Pendanaan
 """
 class ListMarketplace(BaseModel): # Request
-    nama_umkm: Optional[str] # kalau isi berarti pake filter
+    pass
+    # list view bisa search n filter
+    
+    # nama_umkm: Optional[str] # kalau isi berarti pake filter
     # jenis_umkm: Optional[str]
+class CardMarketplace(BaseModel): # Response
+    nama_umkm: str
+    jenis_umkm: str
+    kode_pendanaan: str
+    total_pendanaan: Decimal
+    dana_masuk: Decimal
+    peersen_progres: int = Field(ge=0, le=100)
+    imba_hasil: int = Field(ge=0, le=100)
+    dl_penggalangan_dana: datetime
+class ResponseListMarketplace(BaseModel):
+    pendanaan: List[CardMarketplace]
 
 # Portofolio
 
@@ -126,52 +131,49 @@ Tiap card:
 - tanggal_danai
 - status (belum selsai = status (1,2,3))
 """
-class ListPortofolio(BaseModel):
-    # id_pendana: int
+class ListPortofolio(BaseModel): # Request
     id_akun: int
-    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
+class CardPortofolio(BaseModel):
+    nama_umkm: str
+    kode_pendanaan: str
+    status_pendanaan: int
+    jumlah_danai: int
+    tanggal_danai: datetime
+class ResponseListPortofolio(BaseModel): # Response
+    pendanaan: List[CardPortofolio]
 # Detail Portofolio / Detail Pendanaan
-""" 
-return:
-- nama_pemilik
-- nama_umkm
-- jenis_usaha
-- telp
-- deskripsi_umkm
-
-- kode_pendanaan
-- pendanaan_ke
-- status_pendanaan
-- total_pendanaan
-- dana_masuk
-- persen_progres
-- imba_hasil
-- minimal_pendanaan
-- dl_penggalangan_dana
-- dl_bagi_hasil
-- deskripsi_pendanaan
-- tanggal_pengajuan
-- tanggal_selesai
-
-- is_telat (true/false/null) (tanggal_selesai > dl_bagi_hasil)
-- bunga (total_pendanaan * imba_hasil)
-- total_bagi_hasil (total_pendanaan + total_pendanaan * imba_hasil)
-- durasi_pendanaan ()
-
-- jumlah_danai
-- tanggal_danai #tanggal pendanaan yang terakhir
-"""
-class DetailPendanaan(BaseModel):
+class DetailPendanaan(BaseModel): # Request
     id_pendanaan: int
-    # id_pendana: int # yang ngeklik siapa
     id_akun: int
-    jenis_user: int = Field(ge=1, le=2) # 1 = UMKM | 2 = pendana
+    jenis_user: int
+class ResponseDetailPendanaan(BaseModel): # Response
+    nama_pemilik: str
+    nama_umkm: str
+    jenis_usaha: str
+    telp: str
+    deskripsi_umkm: str
+    kode_pendanaan: str
+    pendanaan_ke: int
+    status_pendanaan: int
+    total_pendanaan: Decimal
+    dana_masuk: Decimal
+    persen_progres: int
+    imba_hasil: int
+    minimal_pendanaan: Decimal
+    dl_pendanaan_dana: datetime
+    dl_bagi_hasil: datetime
+    deskripsi_pengajuan: str
+    tanggal_pengajuan: datetime
+    tanggal_selesai: Optional[datetime] = None
+    is_telat: Optional[bool] = None
+    bunga: Optional[float] = None
+    total_bagi_hasil: Optional[float] = None
+    jumlah_danai: Decimal
+    tanggal_danai: datetime
 # Profil
-"""
-return:
-message
-"""
-class EditProfilPendana(BaseModel):
+class ProfilPendana(BaseModel): # Request
+    id_akun: int
+class ResponseProfilPendana(BaseModel): # Response
     foto_profil: str
     nama_pendana: str
     email: str
@@ -179,52 +181,80 @@ class EditProfilPendana(BaseModel):
     alamat: str
     username: str
     password: str
+"""
+return:
+message (jika error)
+schema ResponseProfilPendana (jika berhasil)
+"""
+class EditProfilPendana(BaseModel): # Request
+    id_akun: int
+    foto_profil: Optional[str] = None
+    nama_pendana: Optional[str] = None
+    email: Optional[str] = None
+    telp: Optional[str] = None
+    alamat: Optional[str] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
 
 """ UMKM """
 
 # Beranda
 
 # Usahaku
-""" 
-return:
-- nama_umkm
-- jenis_umkm
-- total_pinjaman
-- total_pengeluaran
-- limit_pinjaman
-- pendanaan: [
-{
- - kode_pendanaan
- - tanggal_pengajuan
- - deskripsi_pendanaan
- - status_pendanaan
- - total_bayar (total_pendanaan + total_pendanaan * imba_hasil)
- - persen_progres
- - dana_masuk
- - dl_penggalangan_dana
- - tanggal_pengajuan
- - tanggal_selesai (kalau null berati blm selesai)
-},
-{},
-{}
-]
-"""
-class Usahaku(BaseModel):
-    id_umkm: int
+class Usahaku(BaseModel): # Request
+    id_akun: int
+class PendanaanUsahaku(BaseModel):
+    kode_pendanaan: str
+    deskripsi_pendanaan: str
+    status_pendanaan: str
+    dana_masuk: float
+    dl_penggalangan_dana: str
+    tanggal_pengajuan: datetime
+    tanggal_selesai: Optional[datetime] = None # (kalau null berati blm selesai)
+    total_bayar: float # (total_pendanaan + total_pendanaan * imba_hasil)
+    persen_progres: int
+class ResponseUsahaku(BaseModel): # Response
+    nama_umkm: str
+    jenis_usaha: str
+    limit_pinjaman: float
+    total_pinjaman: float
+    total_pengeluaran: float
+    pendanaan: List[PendanaanUsahaku]
 # Lihat Pendana
-""" 
-return:
-[
-    {
-        nama_pendana
-        jumlah_danai
-        tanggal_danai
-    },
-    {}
-]
-"""
-class ListPendana(BaseModel):
+class LihatPendana(BaseModel): # Request
     id_pendanaan: int
+class DataPendana(BaseModel):
+    nama_pendana: str
+    jumlah_danai: Decimal
+    tanggal_danai: datetime
+class ResponseLihatPendana(BaseModel): # Response
+    pendana: List[DataPendana]
+# Mengajukan pendanaan
+# return: text
+class MengajukanPendanaan(BaseModel): # Request=============================================butuh notif
+    id_akun: int
+    deskripsi_pendanaan: str
+    imba_hasil: int
+    minimal_pendanaan: Decimal
+    dl_penggalangan_dana: int # x hari dari sekarang
+    # dl_bagi_hasil 1 bulan dari dl_penggalangan_dana
+    total_pendanaan: Decimal # backend cek apakah lebih dari limit_pinjaman
+class ResponseMengajukanPendanaan(BaseModel): # Response
+    id_pendanaan: int
+    id_umkm: int
+    pendanaan_ke: int
+    kode_pendanaan: str
+    status_pendanaan: int
+    total_pendanaan: Decimal
+    dana_masuk: Decimal
+    imba_hasil: int
+    minimal_pendanaan: Decimal
+    dl_penggalangan_dana: datetime
+    dl_bagi_hasil: datetime
+    deskripsi_pendanaan: str
+    tanggal_pengajuan: datetime
+    tanggal_selesai: Optional[datetime] = None
+    
 # Bayar Tagihan
 
 # Profil
