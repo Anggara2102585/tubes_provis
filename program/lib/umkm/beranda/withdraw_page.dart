@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TarikDanaPage extends StatefulWidget {
   @override
@@ -8,6 +9,26 @@ class TarikDanaPage extends StatefulWidget {
 class _TarikDanaPageState extends State<TarikDanaPage> {
   int _selectedIndex = 0;
   double saldo = 1000; // Saldo awal
+  late int id_akun;
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   TextEditingController jumlahController = TextEditingController();
   TextEditingController nomorRekeningController = TextEditingController();
@@ -93,6 +114,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
 
   @override
   void initState() {
+    _getId();
     super.initState();
     originalJumlahController.text = jumlahController.text;
     originalNomorRekeningController.text = nomorRekeningController.text;
@@ -111,7 +133,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tarik Dana'),
+        title: Text('Tarik Dana, $id_akun'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

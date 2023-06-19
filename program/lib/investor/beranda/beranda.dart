@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../assets/font.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,6 +9,33 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+
+  late int id_akun;
+
+  @override
+  void initState() {
+    super.initState();
+    _getId();
+  }
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -65,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Nama Pengguna',
+                            '$id_akun',
                             style: bodyTextStyle,
                           ),
                         ],

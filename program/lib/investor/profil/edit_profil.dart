@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:myapp/models/profil.dart';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -21,6 +22,27 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   bool isEditMode = false;
   Uint8List? _selectedImage;
+  late int id_akun;
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
+
   // final ImagePickerWeb _imagePicker = ImagePickerWeb();
   // final models = ActivityCubit();
   // var futureProfil = ActivityCubit.fetchData();
@@ -100,6 +122,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
+    _getId();
     // futureProfil = models.fetchData() as ActivityProfil;
     // Initialize the text field values with previous data
     nameController.text = 'User Name';

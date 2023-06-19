@@ -15,6 +15,7 @@ import 'package:myapp/investor/portofolio/portofolio_page.dart';
 import 'package:myapp/investor/profil/edit_profil.dart';
 import 'package:myapp/investor/profil/profil_page.dart';
 import 'package:myapp/investor/profil/pusatbantuan_page.dart';
+import 'package:myapp/umkm/beranda/beranda.dart';
 
 void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -38,5 +39,6 @@ void main() => runApp(MaterialApp(
         '/detail-portofolio': (context) => DetailPortofolioPage(),
         '/pusatbantuan': (context) => const PusatBantuanPage(),
         '/edit_profil': (context) => EditProfilePage(),
+        '/berandaUMKM': (context) => HomePageUMKM(),
       },
     ));

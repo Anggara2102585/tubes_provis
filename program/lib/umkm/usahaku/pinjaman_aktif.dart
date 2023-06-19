@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'pendana.dart';
 
-class PinjamanLunas extends StatefulWidget {
+class PinjamanAktif extends StatefulWidget {
   @override
-  _PinjamanLunasState createState() => _PinjamanLunasState();
+  _PinjamanAktifState createState() => _PinjamanAktifState();
 }
 
-class _PinjamanLunasState extends State<PinjamanLunas>
+class _PinjamanAktifState extends State<PinjamanAktif>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -50,21 +50,6 @@ class _PinjamanLunasState extends State<PinjamanLunas>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Keuntungan',
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                      Text(
-                        'Rp XXX',
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
                         'Bagi Hasil',
                         style: TextStyle(fontSize: 16.0),
                       ),
@@ -80,7 +65,22 @@ class _PinjamanLunasState extends State<PinjamanLunas>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Total',
+                        'Bagi Hasil',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                      Text(
+                        'Rp XXX',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Maks. Pinjam',
                         style: TextStyle(fontSize: 16.0),
                       ),
                       Text(
@@ -130,12 +130,17 @@ class _PinjamanLunasState extends State<PinjamanLunas>
           ),
           SizedBox(height: 8.0),
           Text(
-            'Tanggal Selesai: DD/MM/YYYY',
+            'Batas Penggalangan Dana: DD/MM/YYYY',
             style: TextStyle(fontSize: 16.0),
           ),
           SizedBox(height: 8.0),
           Text(
-            'Status Pinjaman: XXX',
+            'Batas Pengembalian Dana: DD/MM/YYYY',
+            style: TextStyle(fontSize: 16.0),
+          ),
+          SizedBox(height: 8.0),
+          Text(
+            'Bagi Hasil: Rp XXX',
             style: TextStyle(fontSize: 16.0),
           ),
           SizedBox(height: 8.0),
@@ -145,7 +150,7 @@ class _PinjamanLunasState extends State<PinjamanLunas>
           ),
           SizedBox(height: 8.0),
           Text(
-            'Jumlah Tagihan: Rp XXX',
+            'Maksimum Pinjaman: Rp XXX',
             style: TextStyle(fontSize: 16.0),
           ),
           SizedBox(height: 16.0),

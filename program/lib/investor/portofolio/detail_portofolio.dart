@@ -1,9 +1,41 @@
 import 'package:flutter/material.dart';
 import 'portofolio_page.dart';
 import '../../assets/font.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DetailPortofolioPage extends StatelessWidget {
+class DetailPortofolioPage extends StatefulWidget {
   const DetailPortofolioPage({Key? key}) : super(key: key);
+  @override
+  _DetailPortofolioPageState createState() => _DetailPortofolioPageState();
+}
+
+class _DetailPortofolioPageState extends State<DetailPortofolioPage> {
+  late int id_akun;
+
+  @override
+  void initState() {
+    super.initState();
+    _getId();
+  }
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

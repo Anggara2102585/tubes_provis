@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/assets/font.dart';
 import 'package:myapp/models/profil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
@@ -12,6 +13,33 @@ class ProfilPage extends StatefulWidget {
 class ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
   var f = ActivityCubit();
+  late int id_akun;
+
+  @override
+  void initState() {
+    super.initState();
+    _getId();
+  }
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
+
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
       // Kembali ke halaman sebelumnya
@@ -99,7 +127,7 @@ class _ProfilPageContent extends StatelessWidget {
             ),
           ),
           ListTile(
-            title: const Text('Akun'),
+            title: Text('Akun'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               Navigator.pushNamed(context, '/edit_profil');
@@ -118,7 +146,7 @@ class _ProfilPageContent extends StatelessWidget {
           const Divider(),
           ListTile(
             title: const Text(
-              'Keluar',
+              'Keluar,',
               style: TextStyle(color: Colors.red),
             ),
             trailing: const Icon(Icons.exit_to_app, color: Colors.red),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -13,6 +14,32 @@ class _MyAppState extends State<MyApp> {
   String selectedEwallet = 'OVO';
   String topUpAmount = '0';
   int _selectedIndex = 0;
+  late int id_akun;
+
+  @override
+  void initState() {
+    super.initState();
+    _getId();
+  }
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   final List<String> bankOptions = [
     'BNI',
@@ -71,7 +98,7 @@ class _MyAppState extends State<MyApp> {
         textDirection: TextDirection.ltr,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Top Up'),
+            title: Text('Top Up, $id_akun'),
           ),
           body: SingleChildScrollView(
             child: Padding(

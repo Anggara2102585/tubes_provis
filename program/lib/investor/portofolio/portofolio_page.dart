@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../assets/font.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Portofolio {
   String judul;
@@ -23,6 +24,32 @@ class PortofolioPage extends StatefulWidget {
 
 class _PortofolioPageState extends State<PortofolioPage> {
   int _selectedIndex = 2; // Set default selected index to 2 (Portofolio)
+  late int id_akun;
+
+  @override
+  void initState() {
+    super.initState();
+    _getId();
+  }
+
+  void _getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_akun = prefs.getInt('id_akun') ?? 0;
+    });
+    if (id_akun == 0) {
+      _goToLoginPage();
+    }
+  }
+
+  void _goToLoginPage() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (route) =>
+          false, // use (route) => false to remove all existing routes, effectively clearing the stack
+    );
+  }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
