@@ -133,16 +133,10 @@ class _PinjamanBelumLunasState extends State<PinjamanBelumLunas>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (adaBelumLunas == 1)
-                Text(
-                  'Batas Pinjaman: ',
-                  style: TextStyle(fontSize: 12.0),
-                )
-              else if (adaBelumLunas == 2)
-                Text(
-                  'Batas Bagi Hasil: ',
-                  style: TextStyle(fontSize: 12.0),
-                ),
+              Text(
+                'Tenggat Bagi Hasil: ',
+                style: TextStyle(fontSize: 12.0),
+              ),
               Text(
                 'DD/MM/YYYY', // Replace with actual date
                 style: TextStyle(fontSize: 12.0),
@@ -151,17 +145,12 @@ class _PinjamanBelumLunasState extends State<PinjamanBelumLunas>
           ),
           SizedBox(height: 8.0),
           Text(
-            'Total Pinjaman: Rp XXX',
+            'Maksimum Pinjaman: Rp XXX',
             style: TextStyle(fontSize: 16.0),
           ),
           SizedBox(height: 8.0),
           Text(
-            'Dana Masuk: Rp XXX',
-            style: TextStyle(fontSize: 16.0),
-          ),
-          SizedBox(height: 8.0),
-          Text(
-            'Imba Hasil: Rp XXX',
+            'Bagi Hasil: Rp XXX',
             style: TextStyle(fontSize: 16.0),
           ),
           SizedBox(height: 8.0),
@@ -169,13 +158,28 @@ class _PinjamanBelumLunasState extends State<PinjamanBelumLunas>
             'Jumlah Tagihan: Rp XXX',
             style: TextStyle(fontSize: 16.0),
           ),
-          SizedBox(height: 16.0),
+          SizedBox(height: 20.0),
           Expanded(
             child: Align(
               alignment: Alignment.topCenter,
               child: ElevatedButton(
                 onPressed: () {
-                  // Logic to handle payment
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Pembayaran Berhasil!'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Menutup dialog
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 child: Text('Bayar Tagihan'),
               ),
@@ -197,19 +201,13 @@ class _PinjamanBelumLunasState extends State<PinjamanBelumLunas>
             style: TextStyle(fontSize: 16.0),
           ),
           SizedBox(height: 8.0),
-          if (adaBelumLunas == 1)
-            Text(
-              'Batas Pinjaman: DD/MM/YYYY',
-              style: TextStyle(fontSize: 16.0),
-            )
-          else if (adaBelumLunas == 2)
-            Text(
-              'Batas Bagi Hasil: DD/MM/YYYY',
-              style: TextStyle(fontSize: 16.0),
-            ),
+          Text(
+            'Batas Pengembalian Dana: DD/MM/YYYY',
+            style: TextStyle(fontSize: 16.0),
+          ),
           SizedBox(height: 8.0),
           Text(
-            'Minimal Pinjaman: Rp XXX',
+            'Minimal Pendanaan: Rp XXX',
             style: TextStyle(fontSize: 16.0),
           ),
           SizedBox(height: 16.0),

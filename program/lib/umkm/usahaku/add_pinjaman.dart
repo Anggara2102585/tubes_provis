@@ -10,6 +10,7 @@ class _PinjamanFormState extends State<PinjamanForm> {
   TextEditingController _deskripsiController = TextEditingController();
   TextEditingController _imbaController = TextEditingController();
   TextEditingController _minimalController = TextEditingController();
+  TextEditingController _totalController = TextEditingController();
   TextEditingController _dlPenggalanganController = TextEditingController();
 
   @override
@@ -17,6 +18,7 @@ class _PinjamanFormState extends State<PinjamanForm> {
     _deskripsiController.dispose();
     _imbaController.dispose();
     _minimalController.dispose();
+    _totalController.dispose();
     _dlPenggalanganController.dispose();
     super.dispose();
   }
@@ -25,9 +27,10 @@ class _PinjamanFormState extends State<PinjamanForm> {
     if (_formKey.currentState!.validate()) {
       // Proses submit form
       String deskripsi = _deskripsiController.text;
-      String imba = _imbaController.text;
+      int imba = int.parse(_imbaController.text);
       double minimal = double.parse(_minimalController.text);
-      String penggalangan = _dlPenggalanganController.text;
+      double totalDana = double.parse(_totalController.text);
+      int penggalangan = int.parse(_dlPenggalanganController.text);
 
       // Lakukan sesuatu dengan data yang diinputkan
       // Misalnya, simpan ke database atau lakukan validasi lainnya
@@ -60,7 +63,7 @@ class _PinjamanFormState extends State<PinjamanForm> {
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Deskripsi pinjaman harus diisi';
+                    return 'Deskripsi Pinjaman harus diisi';
                   }
                   return null;
                 },
@@ -69,11 +72,16 @@ class _PinjamanFormState extends State<PinjamanForm> {
                 controller: _imbaController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Imba Pinjaman',
+                  labelText: 'Bagi Hasil',
+                  suffixText: '%',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Imba pinjaman harus diisi';
+                    return 'Bagi Hasil harus diisi';
+                  }
+                  // Cek apakah nilai yang dimasukkan merupakan angka
+                  if (int.tryParse(value) == null) {
+                    return 'Bagi Hasil harus berupa angka';
                   }
                   return null;
                 },
@@ -82,15 +90,32 @@ class _PinjamanFormState extends State<PinjamanForm> {
                 controller: _minimalController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Minimal Pinjaman',
+                  labelText: 'Minimal Pendanaan',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Minimal pinjaman harus diisi';
+                    return 'Minimal Pendanaan harus diisi';
                   }
                   // Cek apakah nilai yang dimasukkan merupakan angka
                   if (double.tryParse(value) == null) {
-                    return 'Minimal pinjaman harus berupa angka';
+                    return 'Minimal Pendanaan harus berupa angka';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _totalController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Maksimum Pinjaman',
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Maksimum Pinjaman harus diisi';
+                  }
+                  // Cek apakah nilai yang dimasukkan merupakan angka
+                  if (double.tryParse(value) == null) {
+                    return 'Maksimum Pinjaman harus berupa angka';
                   }
                   return null;
                 },
@@ -104,6 +129,10 @@ class _PinjamanFormState extends State<PinjamanForm> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Deadline Penggalangan Dana harus diisi';
+                  }
+                  // Cek apakah nilai yang dimasukkan merupakan angka
+                  if (int.tryParse(value) == null) {
+                    return 'Deadline Penggalangan Dana harus berupa angka';
                   }
                   return null;
                 },

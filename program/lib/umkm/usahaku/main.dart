@@ -5,11 +5,10 @@ import 'pinjaman_lunas.dart';
 import 'add_pinjaman.dart';
 
 import 'package:myapp/umkm/profil/edit_profilUmkm.dart';
-import 'pendanaan_belum_lunas.dart';
-import 'pendanaan_lunas.dart';
 
 import 'pinjaman_belum_lunas.dart';
 import 'pinjaman_lunas.dart';
+import 'pinjaman_aktif.dart';
 import 'add_pinjaman.dart';
 
 import '../beranda/beranda.dart';
@@ -35,6 +34,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/pinjaman_belum_lunas': (context) => PinjamanBelumLunas(),
         '/pinjaman_lunas': (context) => PinjamanLunas(),
+        '/pinjaman_aktif': (context) => PinjamanAktif(),
         '/beranda': (context) => HomePageUMKM(),
         // '/beranda': (context) => HomePage(),
         '/profil': (context) => ProfilUmkmPage(),
@@ -72,7 +72,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
     }
   }
 
-  int adaBelumLunas = 1;
+  int adaBelumLunas = 2;
   double _persentasePinjaman = 60.0; // Persentase pinjaman (contoh)
 
   @override
@@ -186,7 +186,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                       padding: EdgeInsets.all(8.0),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/pinjaman_belum_lunas');
+                          Navigator.pushNamed(context, '/pinjaman_aktif');
                         },
                         child: Container(
                           width: 390.0,
@@ -201,7 +201,7 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Text(
-                                        'Batas Pinjaman',
+                                        'Batas Penggalangan Dana',
                                         style: TextStyle(fontSize: 12.0),
                                       ),
                                       Text(
@@ -225,11 +225,25 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                   Expanded(
                                     child: Align(
                                       alignment: Alignment.bottomRight,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          // Aksi ketika tombol "Bayar" ditekan
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          // Aksi ketika area tombol "Bayar" ditekan
                                         },
-                                        child: Text('Bayar: Rp '),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.green,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          padding: EdgeInsets.all(7),
+                                          child: Text(
+                                            'Total: Rp 1.000.000',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -301,7 +315,25 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                           alignment: Alignment.bottomRight,
                                           child: ElevatedButton(
                                             onPressed: () {
-                                              // Aksi ketika tombol "Bayar" ditekan
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                        'Pembayaran Berhasil!'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop(); // Menutup dialog
+                                                        },
+                                                        child: Text('OK'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
                                             },
                                             child: Text('Bayar: Rp '),
                                           ),
@@ -413,11 +445,25 @@ class _UsahakuPageState extends State<UsahakuPage> {
                                 Expanded(
                                   child: Align(
                                     alignment: Alignment.bottomRight,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        // Aksi ketika tombol "Profit" ditekan
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        // Aksi ketika area tombol "Bayar" ditekan
                                       },
-                                      child: Text('Bayar: Rp '),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        padding: EdgeInsets.all(7),
+                                        child: Text(
+                                          'Total: Rp 1.000.000',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
