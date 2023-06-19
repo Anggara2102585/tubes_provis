@@ -16,32 +16,32 @@ class ProfilPageState extends State<ProfilUmkmPage> {
   int _selectedIndex = 2;
   var cubit = ActivityCubit();
 
-  late int id_akun;
+  // late int id_akun;
 
   @override
   void initState() {
     super.initState();
-    _getId();
+    // _getId();
   }
 
-  void _getId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      id_akun = prefs.getInt('id_akun') ?? 0;
-    });
-    if (id_akun == 0) {
-      _goToLoginPage();
-    }
-  }
+  // void _getId() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     id_akun = prefs.getInt('id_akun') ?? 0;
+  //   });
+  //   if (id_akun == 0) {
+  //     _goToLoginPage();
+  //   }
+  // }
 
-  void _goToLoginPage() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/',
-      (route) =>
-          false, // use (route) => false to remove all existing routes, effectively clearing the stack
-    );
-  }
+  // void _goToLoginPage() {
+  //   Navigator.pushNamedAndRemoveUntil(
+  //     context,
+  //     '/',
+  //     (route) =>
+  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
+  //   );
+  // }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -56,13 +56,13 @@ class ProfilPageState extends State<ProfilUmkmPage> {
     // Navigate to the corresponding page based on the selected index
     switch (_selectedIndex) {
       case 0:
-        Navigator.pushNamed(context, '/beranda');
+        Navigator.pushNamed(context, '/berandaUMKM');
         break;
       case 1:
         Navigator.pushReplacementNamed(context, '/usahaku');
         break;
       case 2:
-        Navigator.pushReplacementNamed(context, '/profil');
+        Navigator.pushReplacementNamed(context, '/profilUmkm');
         break;
     }
   }

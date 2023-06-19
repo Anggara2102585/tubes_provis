@@ -34,11 +34,13 @@ class Pendanaan {
 }
 
 class DetailMarketplacePage extends StatefulWidget {
+  const DetailMarketplacePage({super.key});
+
   @override
-  _DetailMarketplacePageState createState() => _DetailMarketplacePageState();
+  DetailMarketplacePageState createState() => DetailMarketplacePageState();
 }
 
-class _DetailMarketplacePageState extends State<DetailMarketplacePage> {
+class DetailMarketplacePageState extends State<DetailMarketplacePage> {
   int _selectedIndex = 0; // Set default selected index to 2 (Portofolio)
 
   TextEditingController searchController = TextEditingController();
@@ -48,6 +50,20 @@ class _DetailMarketplacePageState extends State<DetailMarketplacePage> {
     setState(() {
       _selectedIndex = index;
     });
+    switch (_selectedIndex) {
+      case 0:
+        Navigator.pushNamed(context, '/beranda');
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/marketplace');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/portofolio');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profil');
+        break;
+    }
   }
 
   final List<UMKM> daftarUMKM = [
@@ -100,7 +116,7 @@ class _DetailMarketplacePageState extends State<DetailMarketplacePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'UMKM Cards',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(primarySwatch: Colors.green),
       home: Scaffold(
         appBar: AppBar(
           title: Row(
@@ -174,6 +190,7 @@ class _DetailMarketplacePageState extends State<DetailMarketplacePage> {
           currentIndex: 1, // Set the current index to 1 (Marketplace)
           selectedItemColor: Colors.green,
           unselectedItemColor: Colors.green[100],
+          onTap: _onItemTapped,
         ),
       ),
     );
@@ -210,7 +227,7 @@ class CardWidget extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: Colors.green,
                     borderRadius: BorderRadius.circular(4.0),
                   ),
                   child: Text(

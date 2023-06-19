@@ -11,32 +11,32 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
   int _selectedIndex = 0;
   double saldo = 1000; // Saldo awal
 
-  late int id_akun;
+  // late int id_akun;
 
   // @override
   // void initState() {
   //   super.initState();
-  //   _getId();
+  //   // _getId();
   // }
 
-  void _getId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      id_akun = prefs.getInt('id_akun') ?? 0;
-    });
-    if (id_akun == 0) {
-      _goToLoginPage();
-    }
-  }
+  // void _getId() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     id_akun = prefs.getInt('id_akun') ?? 0;
+  //   });
+  //   if (id_akun == 0) {
+  //     _goToLoginPage();
+  //   }
+  // }
 
-  void _goToLoginPage() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/',
-      (route) =>
-          false, // use (route) => false to remove all existing routes, effectively clearing the stack
-    );
-  }
+  // void _goToLoginPage() {
+  //   Navigator.pushNamedAndRemoveUntil(
+  //     context,
+  //     '/',
+  //     (route) =>
+  //         false, // use (route) => false to remove all existing routes, effectively clearing the stack
+  //   );
+  // }
 
   TextEditingController jumlahController = TextEditingController();
   TextEditingController nomorRekeningController = TextEditingController();
@@ -125,7 +125,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
   @override
   void initState() {
     super.initState();
-    _getId();
+    // _getId();
     originalJumlahController.text = jumlahController.text;
     originalNomorRekeningController.text = nomorRekeningController.text;
   }
