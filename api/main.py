@@ -415,6 +415,106 @@ def get_pendanaan_marketplace(db: Session = Depends(get_db)):
     response = schemas.ResponseListMarketplace(pendanaan=marketplace_data)
     return response
 
+""" DETAIL MARKETPLACE pakai DETAIL PENDANAAN """
+
+@app.post("/mendanai", response_model=schemas.ResponseMendanai)
+def mendanai_pendanaan(request: schemas.Mendanai, db: Session = Depends(get_db)):
+    # Retrieve the pendana from pendana table using id_akun
+    pendana = (
+        db.query(models.Pendana)
+        .filter(models.Pendana.id_akun == request.id_akun)
+        .first()
+    )
+    if not pendana:
+        raise HTTPException(status_code=404, detail="Pendana not found")
+
+    # Retrieve the pendanaan data
+    pendanaan = (
+        db.query(models.Pendanaan)
+        .filter(models.Pendanaan.id_pendanaan == request.id_pendanaan)
+        .first()
+    )
+    if not pendanaan:
+        raise HTTPException(status_code=404, detail="Pendanaan not found")
+
+    # Check if the nominal is valid
+    minimal_pendanaan = pendanaan.minimal_pendanaan
+    remaining_amount = pendanaan.total_pendanaan - pendanaan.dana_masuk
+
+    if request.nominal < minimal_pendanaan:
+        raise HTTPException(status_code=400, detail="Nominal is less than minimal_pendanaan")
+    
+    # if request.nominal > remaining_amount:
+    #     raise HTTPException(status_code=400, detail="Nominal exceeds the remaining amount")
+
+    # Retrieve the saldo from dompet table
+    dompet = (
+        db.query(models.Dompet)
+        .filter(models.Dompet.id_dompet == pendana.id_dompet)
+        .first()
+    )
+
+    if not dompet:
+        raise HTTPException(status_code=404, detail="Dompet not found")
+
+    saldo = dompet.saldo
+
+    if request.nominal > saldo:
+        raise HTTPException(status_code=400, detail="Insufficient saldo in dompet")
+
+    # Calculate the actual nominal
+    if remaining_amount < minimal_pendanaan:
+        actual_nominal = remaining_amount
+    else:
+        actual_nominal = request.nominal
+
+    if actual_nominal > remaining_amount:
+        actual_nominal = remaining_amount
+
+    # Start the transaction
+    try:
+        # Reduce saldo in dompet
+        dompet.saldo -= actual_nominal
+
+        # Add dana_masuk to pendanaan
+        pendanaan.dana_masuk += actual_nominal
+
+        # Create pendanaan_pendana entry
+        pendanaan_pendana = models.PendanaanPendana(
+            id_pendana=pendana.id_pendana,
+            id_pendanaan=request.id_pendanaan,
+            jumlah_danai=actual_nominal,
+            tanggal_danai=datetime.now()
+        )
+        db.add(pendanaan_pendana)
+
+        # Create riwayat_transaksi entry
+        riwayat_transaksi = models.RiwayatTransaksi(
+            id_dompet=dompet.id_dompet,
+            jenis_transaksi=5,
+            nominal=actual_nominal,
+            tanggal=datetime.now(),
+            keterangan="-"
+        )
+        db.add(riwayat_transaksi)
+
+        db.commit()
+        db.refresh(dompet)
+
+        # Prepare the response data
+        response_data = schemas.ResponseMendanai(
+            id_pendanaan_pendana=pendanaan_pendana.id_pendanaan_pendana,
+            id_dompet=riwayat_transaksi.id_dompet,
+            saldo_dompet=dompet.saldo
+        )
+
+        return response_data
+    
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to mendanai pendanaan")
+
+
 @app.post("/portofolio", response_model=schemas.ResponseListPortofolio)
 def get_portofolio(portofolio_request: schemas.ListPortofolio, db: Session = Depends(get_db)):
     # Retrieve the corresponding pendana based on id_akun
@@ -563,6 +663,12 @@ def edit_profil_pendana(edit_profil_request: schemas.EditProfilPendana, db: Sess
 
     return response
 
+""" 
+UMKM
+"""
+
+""" BERANDA UMKM """
+
 @app.post("/usahaku", response_model=schemas.ResponseUsahaku)
 def get_usahaku(usahaku_request: schemas.Usahaku, db: Session = Depends(get_db)):
     # Retrieve the corresponding UMKM based on id_akun
@@ -610,13 +716,7 @@ def get_usahaku(usahaku_request: schemas.Usahaku, db: Session = Depends(get_db))
     )
 
     return response
-""" 
-asdf
-asdf
-asdf
-asdf
-asdfasfd
- """
+
 @app.post("/lihat_pendana", response_model=schemas.ResponseLihatPendana)
 def lihat_pendana(lihat_pendana_request: schemas.LihatPendana, db: Session = Depends(get_db)):
     # Retrieve the corresponding pendanaan based on id_pendanaan
@@ -647,6 +747,7 @@ def lihat_pendana(lihat_pendana_request: schemas.LihatPendana, db: Session = Dep
 
     return response
 
+""" cek apakah total_pendanaan kurang dari maksimum peminjaman """
 @app.post("/mengajukan_pendanaan", response_model=schemas.ResponseMengajukanPendanaan)
 def mengajukan_pendanaan(mengajukan_pendanaan_request: schemas.MengajukanPendanaan, db: Session = Depends(get_db)):
     # Retrieve the corresponding UMKM based on id_akun

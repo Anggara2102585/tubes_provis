@@ -121,6 +121,15 @@ class CardMarketplace(BaseModel): # Response
     dl_penggalangan_dana: datetime
 class ResponseListMarketplace(BaseModel):
     pendanaan: List[CardMarketplace]
+# Mendanai
+class Mendanai(BaseModel): # Request
+    id_akun: int
+    nominal: Decimal
+    id_pendanaan: int
+class ResponseMendanai(BaseModel): # Response
+    id_pendanaan_pendana: int
+    id_dompet: int
+    saldo_dompet: Decimal
 
 # Portofolio
 
