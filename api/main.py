@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from passlib.context import CryptContext
-from api.scheduler import start_scheduler
+from scheduler import start_scheduler
 
 import schemas, models
 from database import SessionLocal, engine
@@ -409,6 +409,7 @@ def get_pendanaan_marketplace(db: Session = Depends(get_db)):
         persen_progres = (item.dana_masuk / item.total_pendanaan) * 100
 
         pendanaan_data = schemas.CardMarketplace(
+            id_pendanaan=item.id_pendanaan,
             nama_umkm=item.umkm.nama_umkm,
             jenis_usaha=item.umkm.jenis_usaha,
             kode_pendanaan=item.kode_pendanaan,

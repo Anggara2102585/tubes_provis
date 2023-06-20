@@ -111,6 +111,7 @@ class ListMarketplace(BaseModel): # Request
     # nama_umkm: Optional[str] # kalau isi berarti pake filter
     # jenis_umkm: Optional[str]
 class CardMarketplace(BaseModel): # Response
+    id_pendanaan: int
     nama_umkm: str
     jenis_usaha: str
     kode_pendanaan: str
