@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:html' as html;
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import '../../assets/font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared_pref.dart';
+import '../../assets/font.dart';
 
 class TarikDanaPage extends StatefulWidget {
   @override
@@ -10,8 +14,9 @@ class TarikDanaPage extends StatefulWidget {
 
 class _TarikDanaPageState extends State<TarikDanaPage> {
   int _selectedIndex = 0;
-  double saldo = 1000; // Saldo awal
+  double saldo = 0; // Saldo awal
 
+  double nominal = 0;
   int id_akun = 0;
   int jenis_user = 0;
 
@@ -24,8 +29,83 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
     });
   }
 
+  Future<Map<String, double>> fetchDataSaldo() async {
+    final String apiUrl = 'http://127.0.0.1:8000/saldo';
+
+    await _initIdAkun();
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id_akun': id_akun, 'jenis_user': jenis_user}),
+    );
+
+    if (response.statusCode == 200) {
+      // Fetch data successful, handle the response
+      final responseData = jsonDecode(response.body);
+      final Map<String, double> data = {
+        'saldo': responseData['saldo']?.toDouble() ?? 0.0,
+      };
+      setState(() {
+        saldo = data['saldo'] ?? 0.0;
+        saldoController.text = saldo.toStringAsFixed(2);
+      });
+      return data;
+    } else {
+      // Registration failed, show an error message
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Fetch Data Failed'),
+          content: Text('An error occurred during registration.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+      return {};
+    }
+  }
+
+  Future<void> fetchDataTarikDana(double jumlah) async {
+    final String apiUrl = 'http://127.0.0.1:8000/tarik-dana';
+
+    await _initIdAkun();
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(
+          {'nominal': nominal, 'id_akun': id_akun, 'jenis_user': jenis_user}),
+    );
+
+    if (response.statusCode == 200) {
+      // Fetch data successful, handle the response
+      // ini ngedirect tpi gaperlu
+    } else {
+      // Registration failed, show an error message
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Fetch Data Failed'),
+          content: Text('An error occurred during registration.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   TextEditingController jumlahController = TextEditingController();
   TextEditingController nomorRekeningController = TextEditingController();
+  TextEditingController saldoController = TextEditingController();
 
   TextEditingController originalJumlahController = TextEditingController();
   TextEditingController originalNomorRekeningController =
@@ -45,16 +125,15 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
     });
   }
 
-  void _tarikDana() {
+  void _tarikDana() async {
     if (nomorRekeningController.text.isEmpty) {
       _showErrorDialog('Nomor Rekening belum diisi');
       return;
     }
 
-    double jumlah = double.parse(jumlahController.text);
-    setState(() {
-      saldo -= jumlah;
-    });
+    double jumlah = double.tryParse(jumlahController.text) ?? 0.0;
+    await fetchDataTarikDana(jumlah); // Mengirim data ke API
+    fetchDataSaldo(); // Memperbarui saldo setelah berhasil
     _showSuccessDialog();
   }
 
@@ -112,6 +191,12 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
   void initState() {
     super.initState();
     _initIdAkun();
+    fetchDataSaldo().then((saldoData) {
+      setState(() {
+        saldo = saldoData['saldo'] ?? 0.0;
+        saldoController.text = saldo.toStringAsFixed(2);
+      });
+    });
     originalJumlahController.text = jumlahController.text;
     originalNomorRekeningController.text = nomorRekeningController.text;
   }
@@ -120,6 +205,7 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
   void dispose() {
     jumlahController.dispose();
     nomorRekeningController.dispose();
+    saldoController.dispose();
     originalJumlahController.dispose();
     originalNomorRekeningController.dispose();
     super.dispose();
@@ -176,9 +262,21 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
               ),
             ),
             SizedBox(height: 16),
-            Text(
-              'Saldo Tersedia: $saldo',
-              style: bodyTextStyle,
+            FutureBuilder<Map<String, double>>(
+              future: fetchDataSaldo(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final responseData = snapshot.data!;
+                  saldoController.text =
+                      responseData['saldo']?.toStringAsFixed(2) ?? '';
+
+                  return Text(saldoController.text);
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
             ),
             SizedBox(height: 16),
             Text(
@@ -245,87 +343,30 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
               child: ElevatedButton(
                 onPressed: _tarikDana,
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.green,
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  textStyle: buttonTextStyle,
+                  primary: Colors.green,
                 ),
-                child: Text(
-                  'Tarik',
-                  style: bodyBoldTextStyle,
-                ),
+                child: Text('Tarik Dana'),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Marketplace',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart),
-            label: 'Portofolio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.green[100],
-        onTap: _onItemTapped,
-      ),
     );
-  }
-
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) {
-      // Kembali ke halaman sebelumnya
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-
-    // Navigate to the corresponding page based on the selected index
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.pushNamed(context, '/beranda');
-        break;
-      case 1:
-        Navigator.pushNamed(context, '/marketplace');
-        break;
-      case 2:
-        Navigator.pushNamed(context, '/portofolio');
-        break;
-      case 3:
-        Navigator.pushNamed(context, '/profil');
-        break;
-    }
   }
 }
 
-class TarikDanaPageWrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: TarikDanaPage(),
-    );
+class MySharedPrefs {
+  int id_akun = 0;
+  int jenis_user = 0;
+
+  Future<void> getId(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    id_akun = prefs.getInt('id_akun') ?? 0;
+    jenis_user = prefs.getInt('jenis_user') ?? 0;
   }
 }

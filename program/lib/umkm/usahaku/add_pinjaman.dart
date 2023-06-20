@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../shared_pref.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:html' as html;
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../assets/font.dart';
+import 'package:dio/dio.dart';
 
 class PinjamanForm extends StatefulWidget {
   @override
@@ -17,6 +25,11 @@ class _PinjamanFormState extends State<PinjamanForm> {
   //SharedPref
   int id_akun = 0;
   int jenis_user = 0;
+  String deskripsi_pendanaan = "";
+  int imba_hasil = 0;
+  int minimal_pendanaan = 0;
+  int dl_penggalangan_dana = 0;
+  int total_pendanaan = 0;
 
   @override
   void initState() {
@@ -33,6 +46,55 @@ class _PinjamanFormState extends State<PinjamanForm> {
     });
   }
 
+  Future<Map<String, dynamic>> fetchData() async {
+    final String apiUrl = 'http://127.0.0.1:8000/mengajukan_pendanaan';
+
+    await _initIdAkun();
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id_akun': id_akun,
+        'deskripsi_pendanaan': deskripsi_pendanaan,
+        'imba_hasil': imba_hasil,
+        'minimal_pendanaan': minimal_pendanaan,
+        'dl_penggalangan_dana': dl_penggalangan_dana,
+        'total_pendanaan': total_pendanaan,
+      }),
+    );
+
+    final responseData = jsonDecode(response.body);
+    final Map<String, dynamic> data = {
+      'deskripsi_pendanaan': responseData['deskripsi_pendanaan'] ?? '',
+      'imba_hasil': responseData['imba_hasil'] ?? 0,
+      'minimal_pendanaan': responseData['minimal_pendanaan'] ?? 0,
+      'dl_penggalangan_dana': responseData['dl_penggalangan_dana'] ?? 0,
+      'total_pendanaan': responseData['total_pendanaan'] ?? 0,
+    };
+
+    if (response.statusCode == 200) {
+      // Fetch data successful, handle the response
+      return data;
+    } else {
+      // Registration failed, show an error message
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Fetch Data Failed'),
+          content: Text('An error occurred during registration.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+      return {};
+    }
+  }
+
   @override
   void dispose() {
     _deskripsiController.dispose();
@@ -46,15 +108,17 @@ class _PinjamanFormState extends State<PinjamanForm> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Proses submit form
-      String deskripsi = _deskripsiController.text;
-      int imba = int.parse(_imbaController.text);
-      double minimal = double.parse(_minimalController.text);
-      double totalDana = double.parse(_totalController.text);
-      int penggalangan = int.parse(_dlPenggalanganController.text);
+      deskripsi_pendanaan = _deskripsiController.text;
+      imba_hasil = int.parse(_imbaController.text);
+      minimal_pendanaan = int.parse(_minimalController.text);
+      total_pendanaan = int.parse(_totalController.text);
+      dl_penggalangan_dana = int.parse(_dlPenggalanganController.text);
 
       // Lakukan sesuatu dengan data yang diinputkan
       // Misalnya, simpan ke database atau lakukan validasi lainnya
-
+      setState(() {
+        fetchData();
+      });
       // Setelah berhasil, bisa menavigasi ke halaman lain atau memberikan notifikasi
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -111,6 +175,7 @@ class _PinjamanFormState extends State<PinjamanForm> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Minimal Pendanaan',
+                  suffixText: 'Rp',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -128,6 +193,7 @@ class _PinjamanFormState extends State<PinjamanForm> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Maksimum Pinjaman',
+                  suffixText: 'Rp',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -145,6 +211,7 @@ class _PinjamanFormState extends State<PinjamanForm> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Deadline Penggalangan Dana',
+                  suffixText: 'hari lagi',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
