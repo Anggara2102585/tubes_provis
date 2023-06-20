@@ -1033,3 +1033,29 @@ def edit_profil_umkm(edit_umkm_request: schemas.EditProfilUMKM, db: Session = De
     )
 
     return response
+
+
+@app.get("/get_id_pendanaan/{id_akun}")
+def get_portofolio(id_akun: int, db: Session = Depends(get_db)):
+    # Retrieve the corresponding UMKM based on id_akun
+    umkm = (
+        db.query(models.Umkm)
+        .filter(models.Umkm.id_akun == id_akun)
+        .first()
+    )
+    if not umkm:
+        raise HTTPException(status_code=404, detail="UMKM not found")
+
+    # Retrieve the id_pendanaan for the UMKM with status_pendanaan 2 or 3
+    id_pendanaan = (
+        db.query(models.Pendanaan.id_pendanaan)
+        .filter(
+            models.Pendanaan.id_umkm == umkm.id_umkm,
+            models.Pendanaan.status_pendanaan.in_([2, 3])
+        )
+        .first()
+    )
+    if not id_pendanaan:
+        raise HTTPException(status_code=404, detail="No pendanaan found for the given UMKM")
+
+    return {"id_pendanaan": id_pendanaan[0]}
