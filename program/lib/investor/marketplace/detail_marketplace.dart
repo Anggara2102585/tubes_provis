@@ -321,7 +321,7 @@ class PendanaanWidgetBelumLunas extends StatelessWidget {
                                 onPressed: () {
                                   // Add your onPressed logic here
                                 },
-                                child: Text('Bagi Hasil'),
+                                child: Text('DANAI'),
                               ),
                             ],
                           ),
