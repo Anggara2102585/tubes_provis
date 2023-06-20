@@ -702,7 +702,7 @@ def get_umkm_homepage(umkm_request: schemas.BerandaUMKM, db: Session = Depends(g
     saldo = db.query(models.Dompet.saldo).filter(models.Dompet.id_dompet == umkm.id_dompet).scalar()
 
     # Construct the response
-    response = schemas.ResponseBerandaPendana(
+    response = schemas.ResponseBerandaUMKM(
         nama_umkm=umkm.nama_umkm,
         saldo=saldo,
     )
