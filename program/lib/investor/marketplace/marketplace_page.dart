@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../shared_pref.dart';
+
 class MarketplaceCubit extends ChangeNotifier {
   String searchQuery = '';
 
@@ -14,7 +16,30 @@ class MarketplaceCubit extends ChangeNotifier {
   void showFilterOptions() {}
 }
 
-class MarketplacePage extends StatelessWidget {
+class MarketplacePage extends StatefulWidget {
+  @override
+  _MarketplacePageState createState() => _MarketplacePageState();
+}
+
+class _MarketplacePageState extends State<MarketplacePage> {
+  int id_akun = 0;
+  int jenis_user = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initIdAkun();
+  }
+  
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
+  
   Future<List<dynamic>> fetchData() async {
     final String apiUrl = 'http://127.0.0.1:8000/marketplace';
 
@@ -26,6 +51,28 @@ class MarketplacePage extends StatelessWidget {
       return data;
     } else {
       throw Exception('Failed to fetch data from the API');
+    }
+  }
+
+  Future<void> danaiEndpoint(nominal, id_pendanaan) async {
+    final String apiUrl = 'http://127.0.0.1:8000/mendanai';
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id_akun': id_akun,
+        'nominal': nominal,
+        'id_pendanaan': id_pendanaan
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // final responseData = jsonDecode(response.body);
+      // final data = responseData['pendanaan'] as List<dynamic>;
+      // return data;
+    } else {
+      throw Exception('Failed to send data to the API');
     }
   }
 
@@ -46,6 +93,7 @@ class MarketplacePage extends StatelessWidget {
 
                 return Column(
                   children: data.map((item) {
+                    final int idPendanaan = item['id_pendanaan'];
                     final String namaUmkm = item['nama_umkm'];
                     final int persenProgres = item['persen_progres'];
                     final double totalPendanaan = item['total_pendanaan'];
@@ -55,10 +103,11 @@ class MarketplacePage extends StatelessWidget {
                     final int imbaHasil = item['imba_hasil'];
 
                     return GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/detail-marketplace');
-                      },
+                      // onTap: () {
+                      //   Navigator.pushNamed(context, '/detail-marketplace');
+                      // },
                       child: UMKMCard(
+                        id_pendanaan: idPendanaan,
                         nama_umkm: namaUmkm,
                         persen_progres: persenProgres,
                         total_pendanaan: totalPendanaan,
@@ -122,7 +171,8 @@ class MarketplacePage extends StatelessWidget {
   }
 }
 
-class UMKMCard extends StatelessWidget {
+class UMKMCard extends StatefulWidget {
+  final int id_pendanaan;
   final String nama_umkm;
   final int persen_progres;
   final double total_pendanaan;
@@ -131,6 +181,7 @@ class UMKMCard extends StatelessWidget {
   final int imba_hasil;
 
   UMKMCard({
+    required this.id_pendanaan,
     required this.nama_umkm,
     required this.persen_progres,
     required this.total_pendanaan,
@@ -139,6 +190,51 @@ class UMKMCard extends StatelessWidget {
     required this.imba_hasil,
   });
 
+  @override
+  _UMKMCardState createState() => _UMKMCardState();
+}
+
+class _UMKMCardState extends State<UMKMCard> {
+  int id_akun = 0;
+  int jenis_user = 0;
+
+  Future<void> _initIdAkun() async {
+    MySharedPrefs sharedPrefs = MySharedPrefs();
+    await sharedPrefs.getId(context);
+    setState(() {
+      id_akun = sharedPrefs.id_akun;
+      jenis_user = sharedPrefs.jenis_user;
+    });
+  }
+
+  Future<void> danaiEndpoint(nominal, id_pendanaan) async {
+    final String apiUrl = 'http://127.0.0.1:8000/mendanai';
+    await _initIdAkun();
+    print(id_akun);
+    print(id_pendanaan);
+    print(nominal);
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id_akun': id_akun,
+        'nominal': nominal,
+        'id_pendanaan': id_pendanaan
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // final responseData = jsonDecode(response.body);
+      // final data = responseData['pendanaan'] as List<dynamic>;
+      // return data;
+    } else {
+      throw Exception('Failed to send data to the API');
+    }
+  }
+  
+  String nominal = '';
+
   String formatCurrency(double amount) {
     String formattedValue = 'Rp ' +
         amount.toStringAsFixed(0).replaceAllMapped(
@@ -146,6 +242,56 @@ class UMKMCard extends StatelessWidget {
               (Match match) => '${match[1]}.',
             );
     return formattedValue;
+  }
+
+  void showConfirmationDialog(int id_pendanaan) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Konfirmasi"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Apakah Anda yakin ingin mendanai?"),
+              SizedBox(height: 10),
+              Text("Masukkan nominal:"),
+              TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    nominal = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  prefixText: 'Rp ',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text("Tidak"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text("Iya"),
+              onPressed: () {
+                // Perform the DANAI action here
+                if (nominal.isNotEmpty) {
+                  // Use the nominal value here
+                  print('Nominal: $nominal');
+                  danaiEndpoint(nominal, id_pendanaan);
+                }
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -164,7 +310,7 @@ class UMKMCard extends StatelessWidget {
                   child: Row(
                     children: <Widget>[
                       Text(
-                        nama_umkm,
+                        widget.nama_umkm,
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
@@ -181,7 +327,7 @@ class UMKMCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(5.0),
                         ),
                         child: Text(
-                          'Id: $kode_pendanaan',
+                          'Id: ${widget.kode_pendanaan}',
                           style: TextStyle(
                             fontSize: 14.0,
                             color: Colors.white,
@@ -215,7 +361,7 @@ class UMKMCard extends StatelessWidget {
                         ),
                         SizedBox(height: 4.0),
                         Text(
-                          '$imba_hasil%',
+                          '${widget.imba_hasil}%',
                           style: TextStyle(
                             fontSize: 14.0,
                             color: Colors.white,
@@ -248,7 +394,7 @@ class UMKMCard extends StatelessWidget {
                           ),
                           SizedBox(width: 10.0),
                           Text(
-                            '$persen_progres%',
+                            '${widget.persen_progres}%',
                             style: TextStyle(
                               fontSize: 16.0,
                               color: Colors.green,
@@ -259,7 +405,7 @@ class UMKMCard extends StatelessWidget {
                       ),
                       SizedBox(height: 8.0),
                       Text(
-                        'Jumlah Pinjaman: ${formatCurrency(total_pendanaan)}',
+                        'Pendanaan: ${formatCurrency(widget.total_pendanaan)}',
                         style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
@@ -267,7 +413,7 @@ class UMKMCard extends StatelessWidget {
                       ),
                       SizedBox(height: 8.0),
                       Text(
-                        'Tanggal: ${dl_penggalangan_dana.split("T")[0]}',
+                        'Tanggal: ${widget.dl_penggalangan_dana}',
                         style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
@@ -276,7 +422,26 @@ class UMKMCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(width: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    showConfirmationDialog(widget.id_pendanaan);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                    onPrimary: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10.0,
+                    ),
+                  ),
+                  child: Text(
+                    'DANAI',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
           ],

@@ -532,22 +532,36 @@ def get_portofolio(portofolio_request: schemas.ListPortofolio, db: Session = Dep
         raise HTTPException(status_code=404, detail="Pendana not found")
     id_pendana = pendana.id_pendana
 
-    # Retrieve the portfolio data from the database
-    pendanaan = db.query(models.PendanaanPendana).\
-        join(models.Pendanaan, models.PendanaanPendana.id_pendanaan == models.Pendanaan.id_pendanaan).\
-        join(models.Umkm, models.Pendanaan.id_umkm == models.Umkm.id_umkm).\
-        filter(models.PendanaanPendana.id_pendana == id_pendana).\
-        all()
+    # Retrieve the pendanaan_pendana data
+    pendanaan_pendana = db.query(models.PendanaanPendana).filter(models.PendanaanPendana.id_pendana == id_pendana).all()
 
     # Prepare the response data
     portofolio_data = []
-    for item in pendanaan:
+    for pp in pendanaan_pendana:
+        # Retrieve the pendanaan data
+        pendanaan = (
+            db.query(models.Pendanaan)
+            .filter(models.Pendanaan.id_pendanaan == pp.id_pendanaan)
+            .first()
+        )
+        if not pendanaan:
+            raise HTTPException(status_code=404, detail="Pendanaan not found")
+
+        # Retrieve the umkm data
+        umkm = (
+            db.query(models.Umkm)
+            .filter(models.Umkm.id_umkm == pendanaan.id_umkm)
+            .first()
+        )
+        if not umkm:
+            raise HTTPException(status_code=404, detail="UMKM not found")
+
         portofolio_item = schemas.CardPortofolio(
-            nama_umkm=item.umkm.nama_umkm,
-            kode_pendanaan=item.pendanaan.kode_pendanaan,
-            status_pendanaan=item.pendanaan.status_pendanaan,
-            jumlah_danai=item.jumlah_danai,
-            tanggal_danai=item.tanggal_danai
+            nama_umkm=umkm.nama_umkm,
+            kode_pendanaan=pendanaan.kode_pendanaan,
+            status_pendanaan=pendanaan.status_pendanaan,
+            jumlah_danai=pp.jumlah_danai,
+            tanggal_danai=pp.tanggal_danai,
         )
         portofolio_data.append(portofolio_item)
 
