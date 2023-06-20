@@ -18,7 +18,14 @@ class _HomePageState extends State<HomePage> {
     'total_pendanaan': 0,
     'total_bagi_hasil': 0,
     'jumlah_didanai_aktif': 0,
+    'umkm': [
+      {
+        'nama_umkm': '',
+        'sisa_pokok': 0,
+      },
+    ],
   };
+
   int id_akun = 0;
   int jenis_user = 0;
 
@@ -54,6 +61,7 @@ class _HomePageState extends State<HomePage> {
       // Fetch data successful, handle the response
       setState(() {
         _data = responseData; // Store the fetched data in the variable
+        _data?['umkm'] = responseData['umkm'];
       });
       // _data = responseData;
     } else {
@@ -323,7 +331,7 @@ class _HomePageState extends State<HomePage> {
                               TableCell(
                                 child: Padding(
                                   padding: EdgeInsets.all(8.0),
-                                  child: Text('Nama UMKM'),
+                                  child: Text('UMKM'),
                                 ),
                               ),
                               TableCell(
@@ -334,52 +342,35 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           ),
-                          TableRow(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                            ),
-                            children: [
-                              TableCell(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('UMKM 1'),
-                                ),
+                          ..._data?['umkm'].map<TableRow>((umkm) {
+                            return TableRow(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
                               ),
-                              TableCell(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('Rp 500.000'),
+                              children: [
+                                TableCell(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(umkm['nama_umkm']),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          TableRow(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                            ),
-                            children: [
-                              TableCell(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('UMKM 2'),
+                                TableCell(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('Rp ${umkm['sisa_pokok']}',
+                                        style: TextStyle(fontSize: 20.0)),
+                                  ),
                                 ),
-                              ),
-                              TableCell(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('Rp 700.000'),
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Tambahkan baris lebih banyak jika diperlukan
+                              ],
+                            );
+                          }).toList(),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
