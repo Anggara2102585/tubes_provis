@@ -31,9 +31,12 @@ class _PortofolioPageState extends State<PortofolioPage> {
   int id_akun = 0;
   int jenis_user = 0;
 
+  late List<Portofolio> portofolioList = [];
+
   @override
   void initState() {
     super.initState();
+    fetchData();
     _initIdAkun();
   }
 
@@ -46,9 +49,8 @@ class _PortofolioPageState extends State<PortofolioPage> {
     });
   }
 
-  Future<List<Map<String, dynamic>>> fetchData() async {
+  Future<void> fetchData() async {
     final String apiUrl = 'http://127.0.0.1:8000/portofolio';
-
     await _initIdAkun();
 
     final response = await http.post(
@@ -60,10 +62,19 @@ class _PortofolioPageState extends State<PortofolioPage> {
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       final data = responseData['pendanaan'] as List<dynamic>;
-
       final List<Map<String, dynamic>> dataList =
           data.cast<Map<String, dynamic>>();
-      return dataList;
+
+      setState(() {
+        portofolioList = dataList.map((item) {
+          return Portofolio(
+            judul: item['nama_umkm'] as String,
+            deskripsi: item['kode_pendanaan'] as String,
+            tanggalAkhir: item['tanggal_danai'] as String,
+            selesai: item['status_pendanaan'] == 1,
+          );
+        }).toList();
+      });
     } else {
       throw Exception('Failed to fetch data from the API');
     }
@@ -104,63 +115,41 @@ class _PortofolioPageState extends State<PortofolioPage> {
           style: titleTextStyle,
         ),
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: fetchData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            final List<Map<String, dynamic>> dataList = snapshot.data!;
-
-            final List<Portofolio> portofolioList = dataList.map((item) {
-              return Portofolio(
-                judul: item['nama_umkm'] as String,
-                deskripsi: item['kode_pendanaan'] as String,
-                tanggalAkhir: item['tanggal_danai'] as String,
-                selesai: item['status_pendanaan'] == 1,
-              );
-            }).toList();
-
-            return ListView.builder(
-              itemCount: portofolioList.length,
-              itemBuilder: (context, index) {
-                Portofolio portofolio = portofolioList[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(
-                      portofolio.judul,
-                      style: bodyBoldTextStyle,
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          portofolio.tanggalAkhir,
-                          style: bodyTextStyle,
-                        ),
-                        Text(
-                          portofolio.deskripsi,
-                          style: bodyTextStyle,
-                        ),
-                      ],
-                    ),
-                    trailing: Text(
-                      portofolio.selesai ? 'Selesai' : 'Belum Selesai',
-                      style: TextStyle(
-                        color: portofolio.selesai ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.pushNamed(context, '/detail-portofolio');
-                    },
+      body: ListView.builder(
+        itemCount: portofolioList.length,
+        itemBuilder: (context, index) {
+          Portofolio portofolio = portofolioList[index];
+          return Card(
+            child: ListTile(
+              title: Text(
+                portofolio.judul,
+                style: bodyBoldTextStyle,
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    portofolio.tanggalAkhir,
+                    style: bodyTextStyle,
                   ),
-                );
+                  Text(
+                    portofolio.deskripsi,
+                    style: bodyTextStyle,
+                  ),
+                ],
+              ),
+              trailing: Text(
+                portofolio.selesai ? 'Selesai' : 'Belum Selesai',
+                style: TextStyle(
+                  color: portofolio.selesai ? Colors.green : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                Navigator.pushNamed(context, '/detail-portofolio');
               },
-            );
-          }
+            ),
+          );
         },
       ),
       bottomNavigationBar: BottomNavigationBar(

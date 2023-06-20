@@ -24,12 +24,12 @@ class UMKM {
 
 class Pendanaan {
   final String nama;
-  final String deskripsi;
+  final String minimal_pendanaan;
   final String tanggal;
 
   Pendanaan({
     required this.nama,
-    required this.deskripsi,
+    required this.minimal_pendanaan,
     required this.tanggal,
   });
 }
@@ -90,19 +90,19 @@ class DetailMarketplacePageState extends State<DetailMarketplacePage> {
       daftarPendanaanBelumLunas: [
         Pendanaan(
           nama: 'Pendanaan A1',
-          deskripsi: 'Deskripsi Pendanaan A1',
+          minimal_pendanaan: 'Deskripsi Pendanaan A1',
           tanggal: '21 Januari 2021',
         ),
         Pendanaan(
           nama: 'Pendanaan A2',
-          deskripsi: 'Deskripsi Pendanaan A2',
+          minimal_pendanaan: 'Deskripsi Pendanaan A2',
           tanggal: '21 Januari 2022',
         ),
       ],
       daftarPendanaanLunas: [
         Pendanaan(
           nama: 'Pendanaan B1',
-          deskripsi: 'Deskripsi Pendanaan B1',
+          minimal_pendanaan: 'Deskripsi Pendanaan B1',
           tanggal: '21 Januari 2023',
         ),
       ],
@@ -253,13 +253,6 @@ class CardWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Aksi yang ingin dilakukan saat tombol ditekan
-                  },
-                  child: Text('Upload Peminjaman'),
-                ),
               ],
             ),
           ],
@@ -319,7 +312,55 @@ class PendanaanWidgetBelumLunas extends StatelessWidget {
                               ),
                               ElevatedButton(
                                 onPressed: () {
-                                  // Add your onPressed logic here
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      String nominal = '';
+
+                                      return AlertDialog(
+                                        title: Text("Konfirmasi"),
+                                        content: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              "Apakah Anda yakin ingin mendanai?",
+                                            ),
+                                            SizedBox(height: 10),
+                                            Text("Masukkan nominal:"),
+                                            TextFormField(
+                                              onChanged: (value) {
+                                                nominal = value;
+                                              },
+                                              decoration: InputDecoration(
+                                                prefixText: 'Rp ',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            child: Text("Tidak"),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: Text("Iya"),
+                                            onPressed: () {
+                                              // Perform the DANAI action here
+                                              if (nominal.isNotEmpty) {
+                                                // Use the nominal value here
+                                                print('Nominal: $nominal');
+                                              }
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
                                 },
                                 child: Text('DANAI'),
                               ),
@@ -331,7 +372,7 @@ class PendanaanWidgetBelumLunas extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(pendanaan.deskripsi),
+                          Text(pendanaan.minimal_pendanaan),
                           Text(
                             'Tanggal Pengajuan',
                             style: TextStyle(
@@ -415,7 +456,7 @@ class PendanaanWidgetLunas extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(pendanaan.deskripsi),
+                          Text(pendanaan.minimal_pendanaan),
                           Text(
                             'Tanggal Pengajuan',
                             style: TextStyle(
