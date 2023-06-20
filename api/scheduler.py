@@ -10,10 +10,10 @@ def check_pendanaan_status(db: Session):
     current_datetime = datetime.now()
 
     for pendanaan in pendanaans:
-        if pendanaan.dl_penggalangan < current_datetime and pendanaan.status_pendanaan == 1:
+        if pendanaan.dl_penggalangan_dana < current_datetime and pendanaan.status_pendanaan == 1:
             pendanaan.status_pendanaan = 5
             pendanaan.tanggal_selesai = current_datetime
-        elif pendanaan.dl_penggalangan < current_datetime and pendanaan.status_pendanaan == 2:
+        elif pendanaan.dl_penggalangan_dana < current_datetime and pendanaan.status_pendanaan == 2:
             pendanaan.status_pendanaan = 3
             pendanaan.tanggal_selesai = current_datetime
 

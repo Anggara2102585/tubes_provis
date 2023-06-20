@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from passlib.context import CryptContext
+from api.scheduler import start_scheduler
 
 import schemas, models
 from database import SessionLocal, engine
@@ -35,6 +36,13 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# Scheduler
+# This function will be called when the application starts
+@app.on_event("startup")
+async def startup_event():
+    db = SessionLocal()
+    start_scheduler(db)
 
 #upload image
 @app.post("/uploadimage")
