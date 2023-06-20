@@ -267,6 +267,13 @@ class ResponseMengajukanPendanaan(BaseModel): # Response
     tanggal_selesai: Optional[datetime] = None
     
 # Bayar Tagihan
+class MelunasiRequest(BaseModel): # Request
+    id_akun: int
+    id_pendanaan: int
+# class MelunasiData(BaseModel):
+#     saldo_dompet: float
+# class ResponseMelunasi(BaseModel): # Response
+#     data: MelunasiData
 
 # Profil
 class ProfilUMKM(BaseModel): # Request

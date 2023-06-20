@@ -34,24 +34,69 @@ class _TopUpPageState extends State<TopUpPage> {
     });
   }
 
-  Future<List<dynamic>> fetchData() async {
+  Future<void> fetchData() async {
     final String apiUrl = 'http://127.0.0.1:8000/topup';
+
+    await _initIdAkun();
+    double nominal = 0;
+    try {
+      nominal = double.parse(jumlahController.text);
+    } catch (e) {
+      print('Failed to parse omzet: $e');
+    }
 
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(
-          {"nominal": nominal, "id_akun": id_akun, "jenis_user": jenis_user}),
+          {'nominal': nominal, 'id_akun': id_akun, 'jenis_user': jenis_user}),
     );
 
     if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      final data = responseData['message'];
-      return data;
+      // Fetch data successful, handle the response
+      // ini ngedirect tpi gaperlu
     } else {
-      throw Exception('Failed to fetch data from the API');
+      // Registration failed, show an error message
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Fetch Data Failed'),
+          content: Text('An error occurred during registration.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
     }
   }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Sukses',
+          ),
+          backgroundColor: Colors.green,
+          content: Text('Berhasil TopUp.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  TextEditingController jumlahController = TextEditingController();
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
@@ -138,7 +183,7 @@ class _TopUpPageState extends State<TopUpPage> {
         child: Scaffold(
           appBar: AppBar(
             title: Text(
-              'Top Up id_akun', // disini tambahin var id akun
+              'Top Up', // disini tambahin var id akun
               style: titleTextStyle,
             ),
             backgroundColor: Colors.green,
@@ -166,14 +211,14 @@ class _TopUpPageState extends State<TopUpPage> {
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      onChanged: _handleTopUpAmountChange,
+                    child: TextFormField(
+                      controller: jumlahController,
+                      style: bodyTextStyle,
                       decoration: InputDecoration(
                         hintText: '0',
-                        prefixText: 'Rp.',
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(16),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       ),
                     ),
                   ),
@@ -274,13 +319,14 @@ class _TopUpPageState extends State<TopUpPage> {
                     alignment: Alignment.center,
                     child: ElevatedButton(
                       onPressed: () async {
-                        print('Selected Method: $selectedMetode');
-                        print('Selected Bank: $selectedBank');
-                        print('Selected e-Wallet: $selectedEwallet');
-                        print('Top Up Amount: Rp.$topUpAmount');
+                        // print('Selected Method: $selectedMetode');
+                        // print('Selected Bank: $selectedBank');
+                        // print('Selected e-Wallet: $selectedEwallet');
+                        // print('Top Up Amount: Rp.$topUpAmount');
 
-                        final data = await fetchData();
-                        print(data);
+                        await fetchData();
+                        _showSuccessDialog();
+                        // print(data);
                       },
                       style: ElevatedButton.styleFrom(
                         primary:

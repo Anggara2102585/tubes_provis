@@ -804,6 +804,123 @@ def mengajukan_pendanaan(mengajukan_pendanaan_request: schemas.MengajukanPendana
 
     return response
 
+@app.post("/melunasi")
+def melunasi_pendanaan(
+    request: schemas.MelunasiRequest,
+    db: Session = Depends(get_db)
+):
+    # Retrieve the umkm from umkm table using id_akun
+    umkm = (
+        db.query(models.Umkm)
+        .filter(models.Umkm.id_akun == request.id_akun)
+        .first()
+    )
+
+    if not umkm:
+        raise HTTPException(status_code=404, detail="UMKM not found")
+
+    # Retrieve the pendanaan data
+    pendanaan = (
+        db.query(models.Pendanaan)
+        .filter(models.Pendanaan.id_pendanaan == request.id_pendanaan)
+        .first()
+    )
+
+    if not pendanaan:
+        raise HTTPException(status_code=404, detail="Pendanaan not found")
+
+    # Check if the pendanaan is eligible for melunasi
+    if pendanaan.status_pendanaan not in [2, 3]:
+        raise HTTPException(status_code=400, detail="Invalid status_pendanaan for melunasi")
+
+    # Retrieve the dompet data for the umkm
+    dompet_umkm = (
+        db.query(models.Dompet)
+        .filter(models.Dompet.id_umkm == umkm.id_umkm)
+        .first()
+    )
+
+    if not dompet_umkm:
+        raise HTTPException(status_code=404, detail="Dompet for UMKM not found")
+
+    # Calculate the tagihan
+    tagihan = pendanaan.total_pendanaan + (pendanaan.total_pendanaan * pendanaan.imba_hasil / 100)
+
+    if dompet_umkm.saldo < tagihan:
+        raise HTTPException(status_code=400, detail="Insufficient saldo in dompet for melunasi")
+
+    # Start the transaction
+    try:
+        # Reduce saldo from umkm's dompet
+        dompet_umkm.saldo -= tagihan
+
+        # Set status_pendanaan to 4
+        pendanaan.status_pendanaan = 4
+
+        # Retrieve pendanaan_pendana data
+        pendanaan_pendana = (
+            db.query(models.PendanaanPendana)
+            .filter(models.PendanaanPendana.id_pendanaan == request.id_pendanaan)
+            .all()
+        )
+
+        # Process each pendanaan_pendana
+        for pp in pendanaan_pendana:
+            # Retrieve the pendana data
+            pendana = (
+                db.query(models.Pendana)
+                .filter(models.Pendana.id_pendana == pp.id_pendana)
+                .first()
+            )
+
+            if not pendana:
+                raise HTTPException(status_code=404, detail="Pendana not found")
+
+            # Retrieve the dompet data for the pendana
+            dompet_pendana = (
+                db.query(models.Dompet)
+                .filter(models.Dompet.id_dompet == pendana.id_dompet)
+                .first()
+            )
+
+            if not dompet_pendana:
+                raise HTTPException(status_code=404, detail="Dompet for Pendana not found")
+
+            # Calculate the keuntungan_pendana
+            keuntungan_pendana = pp.jumlah_danai + (pp.jumlah_danai * pendanaan.imba_hasil / 100)
+
+            # Create riwayat_transaksi entry for pendana
+            riwayat_transaksi_pendana = models.RiwayatTransaksi(
+                id_dompet=dompet_pendana.id_dompet,
+                jenis_transaksi=5,
+                nominal=keuntungan_pendana,
+                tanggal=datetime.now(),
+                keterangan="bagi hasil diterima"
+            )
+            db.add(riwayat_transaksi_pendana)
+
+            # Add keuntungan_pendana to pendana's saldo
+            pendana.saldo += keuntungan_pendana
+
+        # Create riwayat_transaksi entry for umkm
+        riwayat_transaksi_umkm = models.RiwayatTransaksi(
+            id_dompet=dompet_umkm.id_dompet,
+            jenis_transaksi=5,
+            nominal=tagihan,
+            tanggal=datetime.now(),
+            keterangan="bagi hasil dibayarkan"
+        )
+        db.add(riwayat_transaksi_umkm)
+
+        db.commit()
+        db.refresh(dompet_umkm)
+
+        return {"message": "Pendanaan berhasil dilunasi."}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 @app.post("/profil_umkm", response_model=schemas.ResponseProfilUMKM)
 def get_profil_umkm(profil_umkm_request: schemas.ProfilUMKM, db: Session = Depends(get_db)):
     # Retrieve the profile data from the database based on the given `id_akun`

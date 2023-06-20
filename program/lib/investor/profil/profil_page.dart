@@ -3,6 +3,8 @@ import 'package:myapp/assets/font.dart';
 import 'package:myapp/models/profil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared_pref.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
@@ -14,6 +16,9 @@ class ProfilPage extends StatefulWidget {
 class ProfilPageState extends State<ProfilPage> {
   int _selectedIndex = 3; // Set default selected index to 1 (Profil)
   var f = ActivityCubit();
+  late Map<dynamic, dynamic>? _data = {
+    'nama_pendana': '',
+  };
 
   //SharedPref
   int id_akun = 0;
@@ -22,6 +27,7 @@ class ProfilPageState extends State<ProfilPage> {
   @override
   void initState() {
     super.initState();
+    fetchDataOnce();
     _initIdAkun();
   }
 
@@ -32,6 +38,30 @@ class ProfilPageState extends State<ProfilPage> {
       id_akun = sharedPrefs.id_akun;
       jenis_user = sharedPrefs.jenis_user;
     });
+  }
+
+  Future<void> fetchDataOnce() async {
+    final String apiUrl = 'http://127.0.0.1:8000/pendana/beranda';
+    await _initIdAkun();
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id_akun': id_akun}),
+    );
+    // Assuming the data fetched from the API is in the following format
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      // Fetch data successful, handle the response
+      setState(() {
+        _data = responseData; // Store the fetched data in the variable
+      });
+      // _data = responseData;
+    } else {
+      // Registration failed, throw an exception or return an empty map
+      throw Exception('An error occurred during registration.');
+    }
   }
 
   void _onItemTapped(int index) {
@@ -71,7 +101,7 @@ class ProfilPageState extends State<ProfilPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: _ProfilPageContent(),
+        child: _ProfilPageContent(data: _data),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -99,25 +129,25 @@ class ProfilPageState extends State<ProfilPage> {
       ),
     );
   }
-  // @override
-  // void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-  //   super.debugFillProperties(properties);
-  //   properties.add(DiagnosticsProperty<void>('futureProfil', futureProfil));
-  // }
 }
 
 class _ProfilPageContent extends StatelessWidget {
+  final Map<dynamic, dynamic>? data; // Declare data as a parameter
+
+  const _ProfilPageContent({this.data}); // Accept data as a parameter
+
   @override
   Widget build(BuildContext context) {
+    final String userName = data?['nama_pendana'] ?? '';
     return Center(
       child: Column(
         children: [
           // SizedBox(height: 16.0),
-          const SizedBox(
+          SizedBox(
             width: double.infinity, // Set the container width to fit the screen
             child: _ProfileCard(
               profileImage: 'https://placehold.co/400x400.png',
-              userName: 'John Doe',
+              userName: userName,
             ),
           ),
           ListTile(
