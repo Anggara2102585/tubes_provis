@@ -691,6 +691,23 @@ UMKM
 """
 
 """ BERANDA UMKM """
+@app.post("/umkm/beranda", response_model=schemas.ResponseBerandaUMKM) # Using post because we are not just fetching data but also performing calculations and aggregations based on the provided data.
+def get_umkm_homepage(umkm_request: schemas.BerandaUMKM, db: Session = Depends(get_db)):
+    # Retrieve the UMKM data
+    umkm = db.query(models.Umkm).filter(models.Umkm.id_akun == umkm_request.id_akun).first()
+    if not umkm:
+        raise HTTPException(status_code=404, detail="UMKM not found")
+
+    # Retrieve the saldo from the Dompet table
+    saldo = db.query(models.Dompet.saldo).filter(models.Dompet.id_dompet == umkm.id_dompet).scalar()
+
+    # Construct the response
+    response = schemas.ResponseBerandaPendana(
+        nama_umkm=umkm.nama_umkm,
+        saldo=saldo,
+    )
+
+    return response
 
 @app.post("/usahaku", response_model=schemas.ResponseUsahaku)
 def get_usahaku(usahaku_request: schemas.Usahaku, db: Session = Depends(get_db)):

@@ -211,7 +211,11 @@ class EditProfilPendana(BaseModel): # Request
 """ UMKM """
 
 # Beranda
-
+class BerandaUMKM(BaseModel):
+    id_akun: int
+class ResponseBerandaPendana(BaseModel):
+    nama_umkm: str
+    saldo: Decimal
 # Usahaku
 class Usahaku(BaseModel): # Request
     id_akun: int
