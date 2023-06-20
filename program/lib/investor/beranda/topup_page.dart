@@ -1,39 +1,23 @@
 import 'package:flutter/material.dart';
 import '../../assets/font.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../shared_pref.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 enum MetodeTopUp { transferBank, eWallet }
 
 class TopUpPage extends StatefulWidget {
   @override
   _TopUpPageState createState() => _TopUpPageState();
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Beranda',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: TopUpPage(),
-      initialRoute: '/topup',
-      // routes: {
-      //   '/notification': (context) => NotificationPage(),
-      //   '/topup': (context) => TopUpPage(),
-      //   '/withdraw': (context) => TarikDanaPage(),
-      //   '/marketplace': (context) => MarketplacePage(),
-      //   '/portofolio': (context) => PortofolioPage(),
-      //   '/profil': (context) => ProfilPage(),
-      // },
-    );
-  }
 }
 
 class _TopUpPageState extends State<TopUpPage> {
   int _selectedIndex = 0;
   int id_akun = 0;
   int jenis_user = 0;
+  int nominal = 0;
 
   @override
   void initState() {
@@ -48,6 +32,25 @@ class _TopUpPageState extends State<TopUpPage> {
       id_akun = sharedPrefs.id_akun;
       jenis_user = sharedPrefs.jenis_user;
     });
+  }
+
+  Future<List<dynamic>> fetchData() async {
+    final String apiUrl = 'http://127.0.0.1:8000/topup';
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(
+          {"nominal": nominal, "id_akun": id_akun, "jenis_user": jenis_user}),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      final data = responseData['message'];
+      return data;
+    } else {
+      throw Exception('Failed to fetch data from the API');
+    }
   }
 
   void _onItemTapped(int index) {
@@ -270,11 +273,14 @@ class _TopUpPageState extends State<TopUpPage> {
                   Align(
                     alignment: Alignment.center,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         print('Selected Method: $selectedMetode');
                         print('Selected Bank: $selectedBank');
                         print('Selected e-Wallet: $selectedEwallet');
                         print('Top Up Amount: Rp.$topUpAmount');
+
+                        final data = await fetchData();
+                        print(data);
                       },
                       style: ElevatedButton.styleFrom(
                         primary:

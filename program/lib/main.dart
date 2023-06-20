@@ -30,7 +30,7 @@ void main() => runApp(MaterialApp(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/beranda',
+      initialRoute: '/',
       routes: {
         '/': (context) => LoginPage(),
         '/beranda': (context) => HomePage(),
