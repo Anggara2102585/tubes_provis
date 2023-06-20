@@ -74,6 +74,12 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
     final String apiUrl = 'http://127.0.0.1:8000/tarik-dana';
 
     await _initIdAkun();
+    double nominal = 0;
+    try {
+      nominal = double.parse(jumlahController.text);
+    } catch (e) {
+      print('Failed to parse omzet: $e');
+    }
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -246,9 +252,8 @@ class _TarikDanaPageState extends State<TarikDanaPage> {
                     ),
                   ),
                   Expanded(
-                    child: TextField(
+                    child: TextFormField(
                       controller: jumlahController,
-                      keyboardType: TextInputType.number,
                       style: bodyTextStyle,
                       decoration: InputDecoration(
                         hintText: '0',
